@@ -1,5 +1,7 @@
 {
 	"fileVersion": 1,
 	"versions": {
+		"aurorafw": "0.0.1-alpha.4",
+		"gtk-d": "3.9.0"
 	}
 }
