@@ -1,0 +1,20 @@
+{
+    "name": "sudoku-world",
+    "description": "A sudoku app written in Dlang with Gtkd",
+    "license": "MIT",
+
+    "authors": [
+        "João Lourenço"
+    ],
+
+    "targetPath": "bin",
+    "targetName": "sudoku-world",
+
+    "sourcePaths": ["source"],
+    "importPaths": ["source"],
+
+    "dependencies": {
+        "gtk-d:gtkd": "~>3.9.0",
+        "aurorafw:unit": "~>0.0.1-alpha4"
+    }
+}
