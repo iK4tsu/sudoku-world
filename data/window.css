@@ -1,0 +1,45 @@
+button.main_menu {
+	font: 27px Sans;
+	background-color: rgb(33, 38, 44);
+	color: #FAB7B2;
+	transition: none;
+	border: none;
+}
+
+button.main_menu:focus {
+	background-color: #F44336;
+	color: #FEF0EF;
+}
+
+grid.sudoku {
+	background-color: rgb(33, 38, 44);
+}
+
+entry.no_caret {
+	caret-color: transparent;
+	background-color: rgb(58, 62, 66);
+	transition: none;
+	color: #F44336;
+	font: 45px Sans;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+	border: none;
+}
+
+entry.no_caret:focus {
+	background-color: wheat;
+}
+
+entry.sudoku4x4 {
+	font: 110px Sans;
+}
+
+entry.sudoku6x6 {
+	font: 70px Sans;
+}
+
+.window {
+
+}
