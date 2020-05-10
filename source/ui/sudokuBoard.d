@@ -85,6 +85,11 @@ public class SudokuBoard : Grid
 		cells[row][column].grabFocus();
 	}
 
+	public auto type() @property
+	{
+		return _type;
+	}
+
 	/** Setter
 	 *
 	 * Sets certains properties based on SudokuType
@@ -121,11 +126,35 @@ public class SudokuBoard : Grid
 		}
 	}
 
+	public int[][] toCells()
+	{
+		import std.conv : to;
+		import std.array: empty;
+
+		int[][] ret = new int[][](rows, cols);
+		for (int y; y < rows; y++)
+		{
+			for (int x; x < cols; x++)
+			{
+				const string str = cells[y][x].getText();
+				const int digit = str.empty ? 0 : str.to!int;
+				ret[y][x] = digit;
+			}
+		}
+		return ret;
+	}
+
+	public auto dimensions()
+	{
+		import std.typecons : tuple;
+		return tuple!("rows","columns","regionRows","regionColumns")(rows,cols,regionRows,regionCols);
+	}
+
 	public int rows;
 	public int cols;
+	public int regionRows;
+	public int regionCols;
 
-	private int regionRows;
-	private int regionCols;
 	private SudokuType _type;
 	private SudokuCell[][] cells;
 }
