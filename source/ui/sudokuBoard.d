@@ -90,6 +90,8 @@ public class SudokuBoard : Grid
 		return _type;
 	}
 
+	// FIXME: ui: sudokuBoard: swap SUDOKU_6X6 region dimensions
+	// TODO: ui: sudokuBoard: make use of Sudoku.dimension()
 	/** Setter
 	 *
 	 * Sets certains properties based on SudokuType
@@ -150,6 +152,7 @@ public class SudokuBoard : Grid
 		return tuple!("rows","columns","regionRows","regionColumns")(rows,cols,regionRows,regionCols);
 	}
 
+	// TODO: ui: sudokuBoard: change region to box
 	public int rows;
 	public int cols;
 	public int regionRows;

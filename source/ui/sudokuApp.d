@@ -135,7 +135,7 @@ class SudokuApp : Application
 	{
 		auto board = stkChoiceMiddle.getVisibleChild();
 		// TODO: SudokuApp: implement Json parser
-		import core.sudoku;
+		import core.sudoku.sudoku;
 		Sudoku.toJson(cast(SudokuBoard)board);
 	}
 
