@@ -15,29 +15,22 @@ grid.sudoku {
 	background-color: rgb(33, 38, 44);
 }
 
-entry.no_caret {
-	caret-color: transparent;
-	background-color: rgb(58, 62, 66);
-	transition: none;
-	color: #F44336;
-	font: 45px Sans;
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
-	border-bottom-left-radius: 0;
-	border-bottom-right-radius: 0;
-	border: none;
+/* Solution switch color when checked */
+switch.solution_grid:checked {
+	/* color: #F44336; */
+	background-color: #F44336;
 }
 
-entry.no_caret:focus {
-	background-color: wheat;
+/* Solution switch */
+switch.solution_grid:hover {
+	color: #FAB7B2;
 }
 
-entry.sudoku4x4 {
-	font: 110px Sans;
-}
-
-entry.sudoku6x6 {
-	font: 70px Sans;
+/* Solution switch circular slider */
+switch.solution_grid slider:hover {
+	/* color: transparent; */
+	border-color: #FAB7B2;
+	/* background-color: transparent; */
 }
 
 .window {
