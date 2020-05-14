@@ -3,6 +3,7 @@ module ui.sudokuCell;
 import std.array : join;
 import std.conv : ConvException, to;
 import std.experimental.logger;
+import std.typecons : Tuple, tuple;
 
 import cairo.Context;
 import cairo.c.types;
@@ -21,34 +22,50 @@ import ui.sudokuBoard;
 import ui.sudokuHelper;
 
 
+private enum Color : Tuple!(double, double, double)
+{
+	DIGIT        = tuple(0.957,0.263,0.212),
+	SELECTED     = tuple(0.961,0.876,0.702),
+	FREE_CELL    = tuple(0.267,0.282,0.298),
+	BLOCKED_CELL = tuple(0.227,0.243,0.259)
+}
+
 public class SudokuCell : DrawingArea
 {
 	public this(SudokuBoard board, int row, int column)
 	{
-		int width, height;
+		this.board = board;
+		this.row = row;
+		this.column = column;
+		this.maxDigit = board.rows;
 
+		pencilMark = new SudokuHelper();
+		snyderNotation = new SudokuHelper();
+
+		digitColor      = toRGB(Color.DIGIT.expand);
+		selectedColorBg = toRGB(Color.SELECTED.expand);
+		freeCellColor   = toRGB(Color.FREE_CELL.expand);
+		blockCellColor  = toRGB(Color.BLOCKED_CELL.expand);
+
+		settings();
+
+		// callbacks
+		addOnDraw(&draw);
+		addOnButtonPress(&onButtonPress);
+		addOnKeyPress(&onKeyPress);
+	}
+
+
+	private void settings()
+	{
+		int length;
 		final switch(board.type)
 		{
-			case SudokuType.SUDOKU_4X4:
-				width = height = 150;
-				break;
-
-			case SudokuType.SUDOKU_6X6:
-				width = height = 100;
-				break;
-
-			case SudokuType.SUDOKU_9X9:
-				width = height = 65;
-				break;
+			case SudokuType.SUDOKU_4X4: length = 150; break;
+			case SudokuType.SUDOKU_6X6: length = 100; break;
+			case SudokuType.SUDOKU_9X9: length =  65; break;
 		}
-
-		setSizeRequest(width, height);
-
-		setVisible(true);
-		setHalign(GtkAlign.CENTER);
-		setValign(GtkAlign.CENTER);
-		setCanFocus(true);
-		setSensitive(true);
+		setSizeRequest(length, length);
 
 		setEvents(
 			GdkEventMask.EXPOSURE_MASK
@@ -59,22 +76,12 @@ public class SudokuCell : DrawingArea
 			| GdkEventMask.KEY_PRESS_MASK
 		);
 
-		this.board = board;
-		this.row = row;
-		this.column = column;
-		this.maxDigit = board.rows;
+		setHalign(GtkAlign.CENTER);
+		setValign(GtkAlign.CENTER);
 
-		pencilMark = new SudokuHelper();
-		snyderNotation = new SudokuHelper();
-
-		digitColor      = new RGBA(0.957,0.263,0.212);
-		selectedColorBg = new RGBA(0.961,0.876,0.702);
-		freeCellColor   = new RGBA(0.267,0.282,0.298);
-		blockCellColor  = new RGBA(0.227,0.243,0.259);
-
-		addOnDraw(&draw);
-		addOnButtonPress(&onButtonPress);
-		addOnKeyPress(&onKeyPress);
+		setVisible(true);
+		setCanFocus(true);
+		setSensitive(true);
 	}
 
 
@@ -94,6 +101,22 @@ public class SudokuCell : DrawingArea
 		board.setCellFocus(row, column);
 
 		return false;
+	}
+
+
+	/** RGB color
+	 *
+	 * Params:
+	 *     r = red color
+	 *     g = green color
+	 *     b = blue color
+	 *
+	 * Returns:
+	 *     `RGBA` class with a color corresponding to the values passed
+	 */
+	private RGBA toRGB(double r, double g, double b)
+	{
+		return new RGBA(r,g,b);
 	}
 
 
@@ -184,10 +207,10 @@ public class SudokuCell : DrawingArea
 		if (keyNumber > 0 && keyNumber <= maxDigit)
 		{
 			// detect Shift + <Digit>
-			bool needSnyderNotation = (modifier & ModifierType.SHIFT_MASK) > 0;
+			const bool needSnyderNotation = (modifier & ModifierType.SHIFT_MASK) > 0;
 
 			// detect Ctrl + <Digit>
-			bool needPencilMark = (modifier & ModifierType.CONTROL_MASK) > 0;
+			const bool needPencilMark = (modifier & ModifierType.CONTROL_MASK) > 0;
 
 			if (needSnyderNotation)
 			{
@@ -332,7 +355,6 @@ public class SudokuCell : DrawingArea
 		else
 			backgroundColor = freeCellColor;
 
-		// TODO: ui:sudokuCell: change to tuples and implement a function to do setSourceRgb
 		// set the color
 		cr.setSourceRgb(backgroundColor.red, backgroundColor.green, backgroundColor.blue);
 
@@ -342,7 +364,7 @@ public class SudokuCell : DrawingArea
 		// draw digit if exists and hide helpers
 		if (digit)
 		{
-			cr.setSourceRgb(digitColor.red, digitColor.green, digitColor.blue);
+			cr.setSourceRgb(Color.DIGIT.expand);
 			string text = digit.to!string;
 			auto height = getAllocatedHeight().to!double;
 			auto width = getAllocatedWidth().to!double;
@@ -381,7 +403,7 @@ public class SudokuCell : DrawingArea
 	 */
 	private void printPencilMark(Context cr, double height, double width)
 	{
-		cr.setSourceRgb(digitColor.red, digitColor.green, digitColor.blue);
+		cr.setSourceRgb(Color.DIGIT.expand);
 		cr.setFontSize(height * 0.15);
 		string str = pencilMark.digits.join(" ");
 		printCentered(cr, str, height, width);
@@ -399,7 +421,7 @@ public class SudokuCell : DrawingArea
 	 */
 	private void printSnyderNotation(Context cr, double height, double width)
 	{
-		cr.setSourceRgb(digitColor.red, digitColor.green, digitColor.blue);
+		cr.setSourceRgb(Color.DIGIT.expand);
 		cr.setFontSize(height * 0.15);
 		string str = snyderNotation.digits.join(" ");
 		printTopLeft(cr, str, height, width);
