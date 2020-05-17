@@ -501,12 +501,6 @@ public class SudokuCell : DrawingArea
 	}
 
 
-	public auto blocked() @property
-	{
-		return _blocked;
-	}
-
-
 	private SudokuBoard  board;
 	private RGBA backgroundColor;
 
@@ -514,8 +508,8 @@ public class SudokuCell : DrawingArea
 	private int maxDigit;
 	private int row;
 	private int column;
-	private bool _blocked;
 	private bool mouseHover;
+	public  bool blocked;
 
 	// notation which appears on the corners
 	public SudokuHelper snyderNotation;

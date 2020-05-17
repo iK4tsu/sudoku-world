@@ -169,12 +169,16 @@ public class SudokuBoard : Grid
 	 * Params:
 	 *     digits = matrix of digits
 	 */
-	public void fill(int[][] digits)
+	public void fill(int[][] digits, bool solution = false)
 	{
 		import std.conv : to;
 		for (int i; i < rows; i++)
 			for (int j; j < cols; j++)
+			{
 				cells[i][j].digit = digits[i][j];
+				if (solution && digits[i][j])
+					cells[i][j].blocked = true;
+			}
 	}
 
 

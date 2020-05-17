@@ -142,7 +142,13 @@ class SudokuApp : Application
 	// convert to Json
 	private void onBtnSaveClicked(Button)
 	{
-		auto board = cast(SudokuBoard) stkChoiceMiddle.getVisibleChild();
+		auto board = lastVisibleBoard;
+
+		// check if has solution
+
+
+		// convert to json
+
 		// TODO: SudokuApp: implement Json parser
 		import core.sudoku.sudoku;
 		import core.rule.classic;
@@ -250,6 +256,7 @@ class SudokuApp : Application
 				stkChoiceMiddle.addNamed(solution, "gridCreateSolution");
 			}
 			lastVisibleBoard = cast(SudokuBoard) stkChoiceMiddle.getVisibleChild();
+			solution.fill(lastVisibleBoard.toCells, true);
 			stkChoiceMiddle.setVisibleChild(solution);
 			s.setState(true);
 			s.setActive(true);
