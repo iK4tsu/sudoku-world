@@ -23,11 +23,11 @@ public class SudokuBoard : Grid
 
 		this.type = type;
 
-		// create regions
-		auto regions = new Grid[][](regionCols, regionRows);
-		for (int y; y < regionCols; y++)
+		// create boxes
+		auto boxes = new Grid[][](boxCols, boxRows);
+		for (int y; y < boxCols; y++)
 		{
-			for (int x; x < regionRows; x++)
+			for (int x; x < boxRows; x++)
 			{
 				auto grid = new Grid();
 				grid.setRowSpacing(1);
@@ -52,14 +52,14 @@ public class SudokuBoard : Grid
 
 				// top and bottom margins
 				if (y == 0)                 grid.setMarginTop(4);
-				if (y == regionCols - 1)    grid.setMarginBottom(4);
+				if (y == boxCols - 1)    grid.setMarginBottom(4);
 
 				// left and right margins
 				if (x == 0)                 grid.setMarginLeft(4);
-				if (x == regionRows - 1)    grid.setMarginRight(4);
+				if (x == boxRows - 1)    grid.setMarginRight(4);
 
 				attach(grid, x, y, 1, 1);
-				regions[y][x] = grid;
+				boxes[y][x] = grid;
 			}
 		}
 
@@ -71,7 +71,7 @@ public class SudokuBoard : Grid
 			{
 				auto cell = new SudokuCell(this, y, x);
 				cells[y][x] = cell;
-				regions[y / regionRows][x / regionCols].attach(cell, x % regionCols, y % regionRows, 1, 1);
+				boxes[y / boxRows][x / boxCols].attach(cell, x % boxCols, y % boxRows, 1, 1);
 			}
 		}
 
@@ -136,7 +136,7 @@ public class SudokuBoard : Grid
 		{
 			case SudokuType.SUDOKU_4X4:
 				rows = cols = 4;
-				regionRows = regionCols = 2;
+				boxRows = boxCols = 2;
 				setHalign(GtkAlign.CENTER);
 				setValign(GtkAlign.CENTER);
 				setSizeRequest(600, 600);
@@ -144,8 +144,8 @@ public class SudokuBoard : Grid
 
 			case SudokuType.SUDOKU_6X6:
 				rows = cols = 6;
-				regionRows = 2;
-				regionCols = 3;
+				boxRows = 2;
+				boxCols = 3;
 				setHalign(GtkAlign.CENTER);
 				setValign(GtkAlign.CENTER);
 				setSizeRequest(600, 600);
@@ -153,7 +153,7 @@ public class SudokuBoard : Grid
 
 			case SudokuType.SUDOKU_9X9:
 				rows = cols = 9;
-				regionRows = regionCols = 3;
+				boxRows = boxCols = 3;
 				setHalign(GtkAlign.CENTER);
 				setValign(GtkAlign.CENTER);
 				setSizeRequest(585, 585);
@@ -210,12 +210,12 @@ public class SudokuBoard : Grid
 	 * Used when converting ui information to JSON file
 	 *
 	 * Returns:
-	 *     `tuple`***("rows","columns","regionRows","regionColumns")***
+	 *     `tuple`***("rows","columns","boxRows","boxColumns")***
 	 */
 	public auto dimensions()
 	{
 		import std.typecons : tuple;
-		return tuple!("rows","columns","regionRows","regionColumns")(rows,cols,regionRows,regionCols);
+		return tuple!("rows","columns","boxRows","boxColumns")(rows,cols,boxRows,boxCols);
 	}
 
 
@@ -283,11 +283,10 @@ public class SudokuBoard : Grid
 	}
 
 
-	// TODO: ui: sudokuBoard: change region to box
 	public int rows;
 	public int cols;
-	public int regionRows;
-	public int regionCols;
+	public int boxRows;
+	public int boxCols;
 
 	private SudokuType _type;
 	private SudokuCell[][] cells;

@@ -159,8 +159,8 @@ public class Sudoku
 
 		j.object["rows"] = dim.rows;
 		j.object["columns"] = dim.columns;
-		j.object["boxRows"] = dim.regionRows;
-		j.object["boxColumns"] = dim.regionColumns;
+		j.object["boxRows"] = dim.boxRows;
+		j.object["boxColumns"] = dim.boxColumns;
 
 		// TODO: core: Sudoku: implement file name
 		import std.file : write, exists;
