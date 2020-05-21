@@ -6,6 +6,7 @@ import gtk.Grid;
 import gtk.StyleContext;
 
 import core.sudokuType : SudokuType;
+import core.ruleType : RuleType;
 import ui.sudokuCell;
 
 // TODO: SudokuBoard: implement game board
@@ -22,6 +23,7 @@ public class SudokuBoard : Grid
 		context.addClass("sudoku");
 
 		this.type = type;
+		this.rules = [RuleType.CLASSIC];
 
 		// create boxes
 		auto boxes = new Grid[][](boxCols, boxRows);
@@ -287,6 +289,48 @@ public class SudokuBoard : Grid
 	}
 
 
+	/** Check if all the cells are filled
+	 *
+	 * Returns:
+	 *     `true` if every Cell has a valid digit \
+	 *     `false` otherwise
+	 */
+	public bool complete()
+	{
+		for (int i; i < rows; i++)
+			for (int j; j < cols; j++)
+				if (!cells[i][j].digit)
+					return false;
+
+		return true;
+	}
+
+
+	public void addRule(string rule)
+	in {
+		import std.algorithm : canFind;
+		assert(!canFind(rules, rule));
+	}
+	body
+	{
+		rules ~= rule;
+		trace("Added RULE: ", rule);
+	}
+
+
+	public void removeRule(string rule)
+	in {
+		import std.algorithm : canFind;
+		assert(canFind(rules, rule));
+	}
+	body
+	{
+		import std.algorithm : remove;
+		rules = remove!(a => a == rule)(rules);
+		trace("Removed RULE: ", rule);
+	}
+
+
 	public int rows;
 	public int cols;
 	public int boxRows;
@@ -295,4 +339,5 @@ public class SudokuBoard : Grid
 	private SudokuType _type;
 	private SudokuCell[][] cells;
 	public SudokuCell[] focused;
+	public string[] rules;
 }

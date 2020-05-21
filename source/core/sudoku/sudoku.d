@@ -146,12 +146,12 @@ public class Sudoku
 	public static void toJson(SudokuBoard board)
 	{
 		string sudokuType = board.type;
-		JSONValue j = ["sudokuType": sudokuType];
+		JSONValue j = ["sudokuType" : sudokuType];
 
 		auto cells = board.toCells();
 		j.object["sudoku"] = ["grid" : cells];
 
-		auto rules = ["SudokuClassic"];
+		auto rules = board.rules;
 		j.object["sudoku"]["rules"] = rules;
 
 		import std.typecons : tuple;
@@ -162,10 +162,13 @@ public class Sudoku
 		j.object["boxRows"] = dim.boxRows;
 		j.object["boxColumns"] = dim.boxColumns;
 
-		// TODO: core: Sudoku: implement file name
-		import std.file : write, exists;
-		auto f = "temp.json";
+		// TODO: core:sudoku: implement file name
+		import std.file : write, exists, mkdir;
+		enum directory = "resources";
+		if (!directory.exists)
+			mkdir(directory);
 
+		auto f = directory~"/"~"puzzle"~sudokuType~".json";
 		write(f, j.toJSON(true));
 	}
 
