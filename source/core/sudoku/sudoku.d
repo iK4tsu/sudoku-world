@@ -187,6 +187,30 @@ public class Sudoku
 	}
 
 
+	public static Sudoku fromSudokuBoard(SudokuBoard board)
+	{
+		import core.ruleType;
+		import core.rule.classic;
+
+		Sudoku s = new Sudoku(board.type);
+		s.initialize(board.toCells());
+
+		// rules
+		foreach (rule; board.rules)
+		{
+			final switch (rule)
+			{
+				case RuleType.CLASSIC:
+					s.add(new ClassicRule());
+					break;
+			}
+		}
+
+		// constraints
+		return s;
+	}
+
+
 	public int rows;
 	public int columns;
 	public int boxRows;
