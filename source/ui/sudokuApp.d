@@ -13,8 +13,11 @@ import gtk.AccelGroup;
 import gtk.Box;
 import gtk.Builder;
 import gtk.Button;
+import gtk.ButtonBox;
+import gtk.CheckButton;
 import gtk.ComboBox;
 import gtk.CssProvider;
+import gtk.Dialog;
 import gtk.EditableIF;
 import gtk.Entry;
 import gtk.Grid;
@@ -24,8 +27,11 @@ import gtk.ListStore;
 import gtk.Stack;
 import gtk.StyleContext;
 import gtk.Switch;
+import gtk.ToggleButton;
 import gtk.TreeIter;
+import gtk.VBox;
 import gtk.Widget;
+import gtk.Window;
 
 import core.sudokuType : SudokuType;
 import ui.sudokuBoard;
@@ -103,6 +109,7 @@ class SudokuApp : Application
 		cbSudokuType    =   cast(ComboBox)  builder.getObject("cbSudokuType");
 		btnSave         =   cast(Button)    builder.getObject("btnSave");
 		switchSolution  =   cast(Switch)    builder.getObject("switchSolution");
+		btnBoxRules     =   cast(ButtonBox) builder.getObject("btnBoxRules");
 
 		gridCreate4x4   =   new SudokuBoard(SudokuType.SUDOKU_4X4);
 		gridCreate6x6   =   new SudokuBoard(SudokuType.SUDOKU_6X6);
@@ -136,54 +143,149 @@ class SudokuApp : Application
 			if (i == 0)
 				cbSudokuType.setActiveIter(iter);
 		}
+
+		import core.ruleType;
+		// update btnBoxRules values
+		foreach (type; EnumMembers!RuleType)
+		{
+			auto cButton = new CheckButton(type);
+			if (type == RuleType.CLASSIC)
+				cButton.setActive(true);
+			cButton.addOnToggled(&onRuleToggled);
+			btnBoxRules.packEnd(cButton, true, true, 0);
+		}
+
+		btnBoxRules.showAll();
 	}
 
 
-	// convert to Json
+	private void onRuleToggled(ToggleButton btn)
+	{
+		SudokuBoard board = cast(SudokuBoard) stkChoiceMiddle.getVisibleChild();
+
+		if (btn.getActive())
+		{
+			board.addRule(btn.getLabel());
+		}
+		else
+		{
+			board.removeRule(btn.getLabel());
+		}
+	}
+
+
+	/** Signal for the `save` button in Create menu
+	 *
+	 * This is responsible for making the first basic validations
+	 *   * Checks if the `solution` exists
+	 *   * Checks if the `solution` is complete \
+	 *
+	 * If the `solution` doesn't meet the requirements, then user can choose whether
+	 *     or not he wants to proceed. \
+	 *       * `YES`, the `board` is saved without a solution \
+	 *       * `NO`, the action is cancelled
+	 */
 	private void onBtnSaveClicked(Button)
 	{
-		auto board = lastVisibleBoard;
-
+		// TODO: ui:sudokuApp: implement board check when button save is pressed
+		// board need at least a number filled
 		// check if has solution
-
-
-		// convert to json
-
-		// TODO: SudokuApp: implement Json parser
-		import core.sudoku.sudoku;
-		import core.rule.classic;
-		import gtk.Popover;
-
-		auto label = new Label("A Solution was not privided, proceeding to auto solve");
-		auto notification = new Popover(btnSave);
-		notification.add(label);
-		label.setVisible(true);
-		notification.popup();
-
-		auto iter = new TreeIter();
-		cbSudokuType.getActiveIter(iter);
-		auto model = cbSudokuType.getModel();
-		auto str = model.getValueString(iter, 0);
-		SudokuType st;
-
-		import std.traits : EnumMembers;
-		foreach (type; EnumMembers!SudokuType)
+		if (solution is null || !solution.complete())
 		{
-			if (type == str) st = type;
+			// solution doesn't exist?
+			auto dialog = new Dialog(
+									"No valid solution provided",
+									cast(Window) window,
+									DialogFlags.DESTROY_WITH_PARENT,
+									["Yes","No"],
+									[ResponseType.YES, ResponseType.NO]
+									);
+			dialog.setSizeRequest(480,272);
+
+			auto label = new Label("Solution provided isn't valid.\n"
+									~"Are you sure want to save?\n"
+									~"Saving will not save the current solution.");
+
+			label.setVisible(true);
+			label.setJustify(GtkJustification.CENTER);
+			label.setVexpand(true);
+
+			dialog.addOnResponse(delegate void(int id, Dialog d)
+								{
+									final switch (id)
+									{
+										case ResponseType.YES:
+											save();
+											break;
+
+										case ResponseType.NO:
+											break;
+									}
+
+									d.destroy();
+								});
+
+			auto content = dialog.getContentArea();
+			content.add(label);
+
+			dialog.present();
+		}
+		else
+			validateSolution();
+	}
+
+
+	public void validateSolution()
+	in {
+		assert(solution !is null);
+	}
+	body
+	{
+		import core.sudoku.sudoku;
+		import std.algorithm : equal;
+		auto board = lastVisibleBoard;
+		Sudoku s = Sudoku.fromSudokuBoard(board);
+
+		auto dialog = new Dialog(
+								"",
+								window,
+								DialogFlags.DESTROY_WITH_PARENT,
+								["OK"],
+								[ResponseType.OK]
+								);
+		dialog.setSizeRequest(480,272);
+		dialog.addOnResponse(delegate void(int,Dialog d) { d.destroy(); });
+		Button btnOK = cast(Button) dialog.getWidgetForResponse(ResponseType.OK);
+		btnOK.setSensitive(false);
+
+		auto vbox = dialog.getContentArea();
+		auto label = new Label("Solving puzzle and comparing to solution...");
+		label.setVisible(true);
+		label.setJustify(GtkJustification.CENTER);
+		label.setVexpand(true);
+		vbox.add(label);
+
+		dialog.present();
+		auto solved = s.solve();
+		btnOK.setSensitive(true);
+
+		if (!solution.toCells().equal(solved))
+		{
+			label.setText("An error ocurred!\n"
+							~"The solution provided isn't valid!");
+			return;
 		}
 
-		Sudoku sudoku = new Sudoku(st);
+		label.setText("The solution provided is valid!");
+		save();
+	}
 
-		auto digits = board.toCells();
 
-
-		sudoku.initialize(digits);
-		sudoku.add(new ClassicRule());
-
-		sudoku.solve();
-
-		board.fill(sudoku.solution);
-
+	// TODO: SudokuApp: implement Json parser
+	public void save()
+	{
+		import core.sudoku.sudoku;
+		SudokuBoard board = lastVisibleBoard;
 		Sudoku.toJson(board);
 	}
 
@@ -292,6 +394,7 @@ class SudokuApp : Application
 	private Stack       stkChoiceMiddle;
 
 		// Create Menu
+	private ButtonBox   btnBoxRules;
 	private Box         boxCreateRight;
 	private ComboBox    cbSudokuType;
 	private SudokuBoard gridCreate4x4;
