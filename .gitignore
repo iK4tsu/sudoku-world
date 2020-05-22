@@ -30,3 +30,4 @@ bin/
 # Others
 dscanner.ini
 *.glade~
+resources/
