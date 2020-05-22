@@ -118,16 +118,78 @@
               </packing>
             </child>
             <child>
-              <object class="GtkStack" id="stackChoiceMiddle">
-                <property name="width_request">600</property>
-                <property name="height_request">600</property>
+              <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">center</property>
                 <property name="valign">center</property>
-                <property name="hexpand">True</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">10</property>
                 <child>
-                  <placeholder/>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="spacing">10</property>
+                    <child>
+                      <object class="GtkLabel" id="lblSwitchSolution">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                        <property name="label" translatable="yes">Puzzle Grid</property>
+                        <property name="xalign">0</property>
+                        <property name="yalign">0.5</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkSwitch" id="switchSolution">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                        <style>
+                          <class name="solution_grid"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkStack" id="stackChoiceMiddle">
+                    <property name="width_request">600</property>
+                    <property name="height_request">600</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="hexpand">True</property>
+                    <property name="transition_duration">300</property>
+                    <property name="transition_type">over-right</property>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
                 </child>
               </object>
               <packing>
@@ -144,25 +206,91 @@
                 <property name="halign">end</property>
                 <property name="hexpand">True</property>
                 <child>
-                  <object class="GtkBox" id="boxCreateRight">
+                  <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="vexpand">True</property>
                     <property name="orientation">vertical</property>
-                    <property name="spacing">5</property>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="boxCreateRight">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="margin_top">10</property>
+                        <property name="vexpand">True</property>
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">20</property>
                         <child>
-                          <object class="GtkSwitch" id="switchSolution">
+                          <object class="GtkButtonBox">
                             <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="halign">center</property>
-                            <property name="valign">center</property>
-                            <style>
-                              <class name="solution_grid"/>
-                            </style>
+                            <property name="can_focus">False</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">20</property>
+                            <property name="homogeneous">True</property>
+                            <property name="layout_style">expand</property>
+                            <child>
+                              <object class="GtkComboBox" id="cbSudokuType">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="valign">center</property>
+                                <property name="has_frame">False</property>
+                                <property name="has_entry">True</property>
+                                <property name="entry_text_column">0</property>
+                                <child internal-child="entry">
+                                  <object class="GtkEntry">
+                                    <property name="can_focus">False</property>
+                                    <property name="halign">end</property>
+                                    <property name="text" translatable="yes">Sudoku 4x4</property>
+                                  </object>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">True</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkButtonBox">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="orientation">vertical</property>
+                                <property name="layout_style">expand</property>
+                                <child>
+                                  <object class="GtkCheckButton" id="ckBtnCreateSolution">
+                                    <property name="label" translatable="yes">Create Solution</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="active">True</property>
+                                    <property name="draw_indicator">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">True</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkCheckButton" id="ckBtnCustomSudoku">
+                                    <property name="label" translatable="yes">Custom Sudoku</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="draw_indicator">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">True</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">True</property>
+                                <property name="fill">True</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -171,13 +299,67 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel">
+                          <object class="GtkBox">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="hexpand">True</property>
-                            <property name="label" translatable="yes">Solution Grid</property>
-                            <property name="xalign">0.5</property>
-                            <property name="yalign">0.5</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">2</property>
+                            <child>
+                              <object class="GtkStackSwitcher" id="stkSwitcherRules">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="stack">stackRules</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkStack" id="stackRules">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkButtonBox" id="btnBoxRules">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="orientation">vertical</property>
+                                    <property name="homogeneous">True</property>
+                                    <property name="layout_style">expand</property>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="name">page0</property>
+                                    <property name="title" translatable="yes">Rules</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButtonBox" id="btnBoxConstraints">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="orientation">vertical</property>
+                                    <property name="homogeneous">True</property>
+                                    <property name="layout_style">expand</property>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="name">page1</property>
+                                    <property name="title" translatable="yes">Constraints</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -193,32 +375,13 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkFixed">
-                        <property name="height_request">400</property>
+                      <object class="GtkButtonBox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <child>
-                          <object class="GtkComboBox" id="cbSudokuType">
-                            <property name="width_request">230</property>
-                            <property name="height_request">25</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="has_frame">False</property>
-                            <property name="has_entry">True</property>
-                            <property name="entry_text_column">0</property>
-                            <child internal-child="entry">
-                              <object class="GtkEntry">
-                                <property name="can_focus">False</property>
-                                <property name="halign">end</property>
-                                <property name="text" translatable="yes">Sudoku 4x4</property>
-                              </object>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="x">16</property>
-                            <property name="y">16</property>
-                          </packing>
-                        </child>
+                        <property name="valign">end</property>
+                        <property name="margin_bottom">10</property>
+                        <property name="homogeneous">True</property>
+                        <property name="layout_style">start</property>
                         <child>
                           <object class="GtkButton" id="btnSave">
                             <property name="label" translatable="yes">Save</property>
@@ -229,8 +392,9 @@
                             <property name="valign">center</property>
                           </object>
                           <packing>
-                            <property name="x">54</property>
-                            <property name="y">346</property>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
                           </packing>
                         </child>
                       </object>
@@ -238,51 +402,6 @@
                         <property name="expand">False</property>
                         <property name="fill">True</property>
                         <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkBox">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="orientation">vertical</property>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Rules</property>
-                            <attributes>
-                              <attribute name="font-desc" value="Sans 20"/>
-                              <attribute name="foreground" value="#f5f579790000"/>
-                            </attributes>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkButtonBox" id="btnBoxRules">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="orientation">vertical</property>
-                            <property name="homogeneous">True</property>
-                            <property name="layout_style">expand</property>
-                            <child>
-                              <placeholder/>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">2</property>
                       </packing>
                     </child>
                   </object>
