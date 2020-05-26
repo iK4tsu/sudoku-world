@@ -361,14 +361,12 @@ public class SudokuBoard : Grid
 	 *     rule = rule to add
 	 */
 	public void addRule(string rule)
-	in {
-		import std.algorithm : canFind;
-		assert(!canFind(rules, rule));
-	}
-	body
 	{
-		rules ~= rule;
-		trace("Added RULE: ", rule);
+		if (!canFind(rules, rule))
+		{
+			rules ~= rule;
+			trace("Added RULE: ", rule);
+		}
 	}
 
 
@@ -378,15 +376,13 @@ public class SudokuBoard : Grid
 	 *     rule = rule to remove
 	 */
 	public void removeRule(string rule)
-	in {
-		import std.algorithm : canFind;
-		assert(canFind(rules, rule));
-	}
-	body
 	{
-		import std.algorithm : remove;
-		rules = remove!(a => a == rule)(rules);
-		trace("Removed RULE: ", rule);
+		if (canFind(rules, rule))
+		{
+			import std.algorithm : remove;
+			rules = remove!(a => a == rule)(rules);
+			trace("Removed RULE: ", rule);
+		}
 	}
 
 

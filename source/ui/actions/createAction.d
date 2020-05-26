@@ -71,6 +71,7 @@ class CreateAction
 	{
 		cbSudokuType.addOnChanged(&onCbSudokuTypeChanged);
 		ckBtnCreateSolution.addOnToggled(&onCbBtnCreateSolutionToggled);
+		ckBtnCustomSudoku.addOnToggled(&onCkBtnCreateSolutionToggled);
 		btnSave.addOnClicked(&onBtnSaveClicked);
 		switchSolution.addOnStateSet(&onSwitchSolutionStateSet);
 	}
@@ -102,9 +103,10 @@ class CreateAction
 			if (type == RuleType.CLASSIC)
 			{
 				ckBtn.setActive(true);
+				ckBtn.setSensitive(false);
 			}
 			ckBtn.addOnToggled(&onRuleToggled);
-			btnBoxRules.packEnd(ckBtn, true, true, 0);
+			btnBoxRules.packStart(ckBtn, true, true, 0);
 		}
 		btnBoxRules.showAll();
 	}
@@ -147,6 +149,48 @@ class CreateAction
 			switchSolution.setSensitive(true);
 			switchSolution.setVisible(true);
 			activeSolution = new SudokuBoard(activeBoard.type);
+		}
+	}
+
+
+	/** Runs when `ckBtnCreateSolution` is toggled
+	 *
+	 * Calls a function which is responsible for rule management
+	 *
+	 * See_Also:
+	 *     `updateRuleSensitivity(bool sentitive)`
+	 */
+	private void onCkBtnCreateSolutionToggled(ToggleButton btn)
+	{
+		updateRuleSensitivity(!btn.getActive());
+	}
+
+
+	/** Update rules
+	 *
+	 * Responsible for switching the ability to be resposive to the user input \
+	 * If `sensitive` all, but Classic, rules will be sensitive to the user input \
+	 * Otherwise all won't be sensitive to the user input \
+	 * If a rule is active and `sensitive` is `false`, the respective rule will
+	 *     be removed from the `activeBoard` rules and it's *activeness* will be
+	 *     set to `false`; this doesn't apply to Classic
+	 *
+	 * Params:
+	 *     sensitive = the state to be changed to
+	 */
+	private void updateRuleSensitivity(bool sentitive)
+	{
+		foreach (CheckButton child; btnBoxRules.getChildren().toArray!(CheckButton))
+		{
+			if (child.getLabel() != RuleType.CLASSIC)
+			{
+				if (!sentitive)
+				{
+					child.setActive(false);
+					activeBoard.removeRule(child.getLabel());
+				}
+				child.setSensitive(sentitive);
+			}
 		}
 	}
 
