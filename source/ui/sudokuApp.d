@@ -1,41 +1,21 @@
 module ui.sudokuApp;
 
+import core.stdc.stdlib : exit, EXIT_FAILURE;
 import std.experimental.logger;
-import std.functional : toDelegate;
-
-import gdk.Keysyms;
 
 import gio.Application : GioApplication = Application;
-
 import gtk.Application;
 import gtk.ApplicationWindow;
 import gtk.AccelGroup;
 import gtk.Box;
 import gtk.Builder;
 import gtk.Button;
-import gtk.ButtonBox;
-import gtk.CheckButton;
-import gtk.ComboBox;
 import gtk.CssProvider;
-import gtk.Dialog;
-import gtk.EditableIF;
-import gtk.Entry;
-import gtk.Grid;
-import gdk.Keymap;
-import gtk.Label;
-import gtk.ListStore;
 import gtk.Stack;
 import gtk.StyleContext;
-import gtk.Switch;
-import gtk.ToggleButton;
-import gtk.TreeIter;
-import gtk.VBox;
-import gtk.Widget;
 import gtk.Window;
 
-import core.sudokuType : SudokuType;
 import ui.actions.createAction;
-import ui.sudokuBoard;
 
 class SudokuApp : Application
 {
@@ -55,39 +35,58 @@ class SudokuApp : Application
 		// Detect if are any other instances running
 		if (!app.getIsRemote() && window is null)
 		{
-			trace("Loading UI");
-			builder = new Builder();
-			if (!builder.addFromFile("data/window.glade"))
-			{
-				trace("Window UI file cannot be found");
-				return;
-			}
-
-			// GUI setup
+			loadGlade();
+			loadTopLevel();
+			loadStyle();
 			initGUI();
-
-			// load css style
-			auto provider = new CssProvider();
-			provider.loadFromPath("data/window.css");
-			auto display = window.getDisplay();
-			auto screen = display.getDefaultScreen();
-			StyleContext.addProviderForScreen(screen, provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 		}
-		else warning("Another instance already exists");
-
+		else
+		{
+			warning("Another instance already exists");
+		}
 		// show application
 		window.present();
 	}
 
 
+	// load glade file
+	private void loadGlade()
+	{
+		trace("Loading Glade...");
+		builder = new Builder();
+		if (!builder.addFromFile("data/window.glade"))
+		{
+			critical("window.glade file cannot be found, aborting...");
+			exit(EXIT_FAILURE);
+		}
+	}
+
+
+	// top level
+	private void loadTopLevel()
+	{
+		trace("Loading top level...");
+		window = cast(ApplicationWindow) builder.getObject("window");
+		window.setApplication(this);
+	}
+
+
+	// load css style
+	private void loadStyle()
+	{
+		trace("Loading CSS Style...");
+		auto provider = new CssProvider();
+		provider.loadFromPath("data/window.css");
+		auto display = window.getDisplay();
+		auto screen = display.getDefaultScreen();
+		StyleContext.addProviderForScreen(screen, provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+	}
+
+
+	// GUI setup
 	private void initGUI()
 	{
 		trace("Initializing GUI");
-
-		// top level
-		window = cast(ApplicationWindow) builder.getObject("window");
-		window.setApplication(this);
-
 		// Main menu
 			// widgets
 		auto btnExit   = cast(Button) builder.getObject("btnExit");
@@ -105,7 +104,10 @@ class SudokuApp : Application
 	}
 
 
-	// main menu button
+	/** This is called when `btnCreate` is clicked in the main menu
+	 *
+	 * Makes the create menu content `Stack` visible
+	 */
 	private void onBtnCreateClicked(Button)
 	{
 		stkMenu.setVisibleChild(boxChoice);
@@ -120,7 +122,7 @@ class SudokuApp : Application
 
 	// Widgets
 		// Menu
-	private Stack       stkMenu;
-	private Box         boxMenu;
-	private Box         boxChoice;
+	private Stack stkMenu;
+	private Box boxMenu;
+	private Box boxChoice;
 }
