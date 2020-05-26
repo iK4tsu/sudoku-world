@@ -257,7 +257,8 @@ public class SudokuBoard : Grid
 	{
 		foreach (cell; focused)
 		{
-			cell.digit = digit;
+			if (!cell.blocked)
+				cell.digit = digit;
 		}
 	}
 
