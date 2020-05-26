@@ -84,6 +84,22 @@ public class Grid
 	}
 
 
+	/** Get Cell digits
+	 *
+	 * Params:
+	 *     cells = array of Cells to analyse
+	 *
+	 * Returns:
+	 *     `int[]` with the current digits stored in each Cell of cells
+	 */
+	public auto toDigit(Cell[] cells)
+	{
+		import std.algorithm : map;
+		import std.array : array;
+		return cells.map!(x => x.digit).array;
+	}
+
+
 	/** Get a Grid row
 	 *
 	 * Params:
@@ -142,6 +158,38 @@ public class Grid
 	{
 		import std.array : join;
 		return boxes.join[index];
+	}
+
+
+	/** Get the main diagonal
+	 *
+	 * Returns:
+	 *     `Cell[]` with the Cells of the main diagonal
+	 */
+	public Cell[] mainDiagonal()
+	{
+		Cell[] ret;
+		for (int i; i < width; i++)
+		{
+			ret ~= cells[i][i];
+		}
+		return ret;
+	}
+
+
+	/** Get the antidiagonal
+	 *
+	 * Returns:
+	 *     `Cell[]` with the Cells of the antidiagonal
+	 */
+	public Cell[] antiDiagonal()
+	{
+		Cell[] ret;
+		for (int i; i < width; i++)
+		{
+			ret ~= cells[i][width-i-1];
+		}
+		return ret;
 	}
 
 
@@ -207,6 +255,12 @@ unittest
 	assertTrue(grid.toDigit(b.cells) ==    [[0, 0, 8],
 											[3, 0, 7],
 											[0, 0, 0]]);
+
+	auto arr = grid.mainDiagonal();
+	assertTrue(grid.toDigit(arr) == [0,0,6,0,0,0,0,8,0]);
+
+	arr = grid.antiDiagonal();
+	assertTrue(grid.toDigit(arr) == [0,2,4,8,0,0,0,0,0]);
 
 
 	grid = new Grid(6,6,2,3);
