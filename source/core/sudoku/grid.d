@@ -71,7 +71,7 @@ public class Grid
 	 * Returns:
 	 *     `int[][]` with the current digits stored in each Cell of cells
 	 */
-	public auto toDigit(Cell[][] cells)
+	public static auto toDigit(Cell[][] cells)
 	{
 		import std.algorithm : map;
 		import std.array : array;
@@ -92,7 +92,7 @@ public class Grid
 	 * Returns:
 	 *     `int[]` with the current digits stored in each Cell of cells
 	 */
-	public auto toDigit(Cell[] cells)
+	public static auto toDigit(Cell[] cells)
 	{
 		import std.algorithm : map;
 		import std.array : array;
