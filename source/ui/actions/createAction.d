@@ -222,7 +222,8 @@ class CreateAction
 			{
 				stkMiddle.addNamed(activeSolution, "solution"~activeBoard.type);
 			}
-			activeSolution.fill(activeBoard.toCells());
+			activeSolution = cast(SudokuBoard) stkMiddle.getChildByName("solution"~activeBoard.type);
+			activeSolution.fill(activeBoard.toDigits(), true);
 			stkMiddle.setVisibleChild(activeSolution);
 			s.setState(true);
 			s.setActive(true);
@@ -273,7 +274,7 @@ class CreateAction
 		dialogSolver.present();
 		auto solved = s.solve();
 
-		if (!activeSolution.toCells().equal(solved))
+		if (!activeSolution.toDigits().equal(solved))
 		{
 			dialogSolver.errorMessage();
 			dialogSolver.finished();

@@ -148,7 +148,7 @@ public class Sudoku
 		string sudokuType = board.type;
 		JSONValue j = ["sudokuType" : sudokuType];
 
-		auto cells = board.toCells();
+		auto cells = board.toDigits();
 		j.object["sudoku"] = ["grid" : cells];
 
 		auto rules = board.rules;
@@ -193,7 +193,7 @@ public class Sudoku
 		import core.rule.classic;
 
 		Sudoku s = new Sudoku(board.type);
-		s.initialize(board.toCells());
+		s.initialize(board.toDigits());
 
 		// rules
 		foreach (rule; board.rules)

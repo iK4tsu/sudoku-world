@@ -184,7 +184,6 @@ public class SudokuBoard : Grid
 	}
 
 
-	// TODO: ui:sudokuBoard: change function name to 'toDigits'
 	/** Convert Grid Cells to digits
 	 *
 	 * Used when converting ui information to JSON file
@@ -192,7 +191,7 @@ public class SudokuBoard : Grid
 	 * Params:
 	 *     `int[][]` with every digit
 	 */
-	public int[][] toCells()
+	public int[][] toDigits()
 	{
 		import std.conv : to;
 		import std.array: empty;
