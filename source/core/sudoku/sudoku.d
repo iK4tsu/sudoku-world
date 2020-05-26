@@ -151,7 +151,7 @@ public class Sudoku
 		auto cells = board.toDigits();
 		j.object["sudoku"] = ["grid" : cells];
 
-		auto rules = board.rules;
+		auto rules = board.allRules;
 		j.object["sudoku"]["rules"] = rules;
 
 		import std.typecons : tuple;
@@ -196,7 +196,7 @@ public class Sudoku
 		s.initialize(board.toDigits());
 
 		// rules
-		foreach (rule; board.rules)
+		foreach (rule; board.allRules)
 		{
 			final switch (rule)
 			{

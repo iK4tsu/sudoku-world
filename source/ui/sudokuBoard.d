@@ -1,10 +1,12 @@
 module ui.sudokuBoard;
 
+import std.algorithm : canFind;
 import std.experimental.logger;
 
 import gtk.Grid;
 import gtk.StyleContext;
 
+import core.sudoku.sudoku;
 import core.sudokuType : SudokuType;
 import core.ruleType : RuleType;
 import ui.sudokuCell;
@@ -39,26 +41,18 @@ public class SudokuBoard : Grid
 
 				final switch (type)
 				{
-					case SudokuType.SUDOKU_4X4:
-						setSizeRequest(300,300);
-						break;
-
-					case SudokuType.SUDOKU_6X6:
-						setSizeRequest(300,200);
-						break;
-
-					case SudokuType.SUDOKU_9X9:
-						setSizeRequest(195,195);
-						break;
+					case SudokuType.SUDOKU_4X4: setSizeRequest(300,300); break;
+					case SudokuType.SUDOKU_6X6: setSizeRequest(300,200); break;
+					case SudokuType.SUDOKU_9X9: setSizeRequest(195,195); break;
 				}
 
 				// top and bottom margins
-				if (y == 0)                 grid.setMarginTop(4);
-				if (y == boxCols - 1)    grid.setMarginBottom(4);
+				if (y == 0)           grid.setMarginTop(4);
+				if (y == boxCols - 1) grid.setMarginBottom(4);
 
 				// left and right margins
-				if (x == 0)                 grid.setMarginLeft(4);
-				if (x == boxRows - 1)    grid.setMarginRight(4);
+				if (x == 0)           grid.setMarginLeft(4);
+				if (x == boxRows - 1) grid.setMarginRight(4);
 
 				attach(grid, x, y, 1, 1);
 				boxes[y][x] = grid;
@@ -92,8 +86,6 @@ public class SudokuBoard : Grid
 	 */
 	public void setCellFocus(int row, int column)
 	{
-		import std.algorithm : canFind;
-
 		auto cell = cells[row][column];
 		cell.grabFocus();
 
@@ -115,47 +107,104 @@ public class SudokuBoard : Grid
 			cell.selected = false;
 			cell.queueDraw();
 		}
-
 		focused = [];
 	}
 
 
-	public auto type() @property
+	public auto type() const @property
 	{
 		return _type;
 	}
 
 
-	// TODO: ui: sudokuBoard: make use of Sudoku.dimension()
+	public auto rows() const @property
+	{
+		return _rows;
+	}
+
+
+	public auto cols() const @property
+	{
+		return _cols;
+	}
+
+
+	public auto boxRows() const @property
+	{
+		return _boxRows;
+	}
+
+
+	public auto boxCols() const @property
+	{
+		return _boxCols;
+	}
+
+
+	private void rows(int _rows) @property
+	{
+		this._rows = _rows;
+	}
+
+
+	private void cols(int _cols) @property
+	{
+		this._cols = _cols;
+	}
+
+
+	private void boxRows(int _boxRows) @property
+	{
+		this._boxRows = _boxRows;
+	}
+
+
+	private void boxCols(int _boxCols) @property
+	{
+		this._boxCols = _boxCols;
+	}
+
+
+	/** Setter for all the board dimensions
+	 *
+	 * Params:
+	 *     rows: height
+	 *     cols: width
+	 *     boxRows: box height
+	 *     boxCols: box width
+	 */
+	private void setDimensions(int rows, int cols, int boxRows, int boxCols)
+	in {
+		assert(rows == cols, "rows must be equal to columns");
+		assert(boxRows*boxCols == rows, "box area must be equal to rows and columns");
+	}
+	body
+	{
+		this.rows = rows;
+		this.cols = cols;
+		this.boxRows = boxRows;
+		this.boxCols = boxCols;
+	}
+
+
 	/** Setter
 	 *
 	 * Sets certains properties based on SudokuType
 	 */
-	private void type(SudokuType type) @property
+	private void type(SudokuType _type) @property
 	{
-		_type = type;
+		this._type = _type;
+		setDimensions(Sudoku.dimension(type).expand);
 		final switch (type)
 		{
 			case SudokuType.SUDOKU_4X4:
-				rows = cols = 4;
-				boxRows = boxCols = 2;
-				setHalign(GtkAlign.CENTER);
-				setValign(GtkAlign.CENTER);
-				setSizeRequest(600, 600);
-				break;
-
 			case SudokuType.SUDOKU_6X6:
-				rows = cols = 6;
-				boxRows = 2;
-				boxCols = 3;
 				setHalign(GtkAlign.CENTER);
 				setValign(GtkAlign.CENTER);
 				setSizeRequest(600, 600);
 				break;
 
 			case SudokuType.SUDOKU_9X9:
-				rows = cols = 9;
-				boxRows = boxCols = 3;
 				setHalign(GtkAlign.CENTER);
 				setValign(GtkAlign.CENTER);
 				setSizeRequest(585, 585);
@@ -306,6 +355,11 @@ public class SudokuBoard : Grid
 	}
 
 
+	/** Adds a rule if not existent in `rules`
+	 *
+	 * Params:
+	 *     rule = rule to add
+	 */
 	public void addRule(string rule)
 	in {
 		import std.algorithm : canFind;
@@ -318,6 +372,11 @@ public class SudokuBoard : Grid
 	}
 
 
+	/** Removes a rule if existent in `rules`
+	 *
+	 * Params:
+	 *     rule = rule to remove
+	 */
 	public void removeRule(string rule)
 	in {
 		import std.algorithm : canFind;
@@ -331,13 +390,24 @@ public class SudokuBoard : Grid
 	}
 
 
-	public int rows;
-	public int cols;
-	public int boxRows;
-	public int boxCols;
+	/** Getter for `rules`
+	 *
+	 * Returns:
+	 *     `string[]` with all rules
+	 */
+	public auto allRules() const @property
+	{
+		return rules;
+	}
 
-	private SudokuType _type;
+
+	private int _rows;
+	private int _cols;
+	private int _boxRows;
+	private int _boxCols;
+	private string[] rules;
+
 	private SudokuCell[][] cells;
-	public SudokuCell[] focused;
-	public string[] rules;
+	private SudokuCell[] focused;
+	private SudokuType _type;
 }
