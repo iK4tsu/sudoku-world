@@ -53,11 +53,7 @@ public class Sudoku
 
 	public auto solve()
 	{
-		trace("Trying to find a solution...");
-		if (backtrackAlgorithm(0,0))
-			trace("A solution was found!");
-		else
-			critical("Something went wrong! No solution found.");
+		backtrackAlgorithm(0,0);
 		return solution = grid.toDigit();
 	}
 
