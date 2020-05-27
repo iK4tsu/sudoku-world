@@ -16,14 +16,38 @@ public class Cell
 	 * Params:
 	 *     constraint = constraint to connect
 	 */
-	public void connect(Constraint constraint)
+	public auto connect(C : Constraint)(C constraint)
 	{
 		import std.algorithm : canFind;
-		if (constraint is null || canFind(constraints, constraint))
-			return;
+		if (constraint is null)
+			return null;
 
-		constraints ~= constraint;
-		constraint.connect(this);
+		C c = get!C;
+		if (c is null)
+		{
+			constraints ~= constraint;
+			c = constraint;
+		}
+		else
+		{
+			foreach (Cell cell; constraint.cells)
+			{
+				c.add(cell);
+			}
+		}
+
+		return c;
+	}
+
+
+	public C get(C : Constraint)()
+	{
+		foreach (Constraint c; constraints)
+		{
+			if (c.constraintType == C.getStaticConstraintType())
+				return cast(C) c;
+		}
+		return null;
 	}
 
 

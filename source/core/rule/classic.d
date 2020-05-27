@@ -35,19 +35,19 @@ public class ClassicRule : Rule
 		// rows
 		for (int i; i < sudoku.rows; i++)
 		{
-			new UniqueConstraint(sudoku.grid.row(i));
+			UniqueConstraint.createInterconnected(sudoku.grid.row(i));
 		}
 
 		// columns
 		for (int i; i < sudoku.columns; i++)
 		{
-			new UniqueConstraint(sudoku.grid.column(i));
+			UniqueConstraint.createInterconnected(sudoku.grid.column(i));
 		}
 
 		// boxes
 		for (int i; i < sudoku.rows; i++)
 		{
-			new UniqueConstraint(sudoku.grid.box(i).toArray());
+			UniqueConstraint.createInterconnected(sudoku.grid.box(i).toArray());
 		}
 	}
 }

@@ -23,8 +23,8 @@ class XRule : Rule
 	public void initialize()
 	{
 		// both diagonals
-		new UniqueConstraint(sudoku.grid.mainDiagonal());
-		new UniqueConstraint(sudoku.grid.antiDiagonal());
+		UniqueConstraint.createInterconnected(sudoku.grid.mainDiagonal());
+		UniqueConstraint.createInterconnected(sudoku.grid.antiDiagonal());
 	}
 }
 
