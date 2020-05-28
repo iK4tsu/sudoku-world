@@ -8,10 +8,12 @@ import std.typecons : Tuple, tuple;
 import cairo.Context;
 import cairo.c.types;
 
+import gdk.Device;
 import gdk.DragContext;
 import gdk.Event;
 import gdk.Keymap;
 import gdk.RGBA;
+import gdk.Seat;
 
 import gtk.DrawingArea;
 import gtk.Label;
@@ -53,6 +55,7 @@ public class SudokuCell : DrawingArea
 		addOnDraw(&draw);
 		addOnButtonPress(&onButtonPress);
 		addOnKeyPress(&onKeyPress);
+		addOnEnterNotify(&onEnterNotify);
 	}
 
 
@@ -85,6 +88,19 @@ public class SudokuCell : DrawingArea
 	}
 
 
+	/** Runs when the mouse enter the `Widget's` area
+	 */
+	private bool onEnterNotify(GdkEventCrossing* event, Widget widget)
+	{
+		if (event.state & ModifierType.BUTTON1_MASK)
+		{
+			trace("Enter with button 1 pressed");
+			board.setCellFocus(row, column);
+		}
+		return true;
+	}
+
+
 	private bool onButtonPress(GdkEventButton* ev, Widget w)
 	{
 		if (ev.button != 1)
@@ -99,6 +115,12 @@ public class SudokuCell : DrawingArea
 		// focus this cell
 		// add this cell to the focused list
 		board.setCellFocus(row, column);
+
+		// removes grab from this device
+		// alows other widgets to receive event signals while the mouse button 1
+		//   is pressed
+		Device device = new Device(ev.device);
+		device.getSeat().ungrab();
 
 		return false;
 	}
