@@ -58,6 +58,77 @@ public class UniqueConstraint : Constraint
 	}
 
 
+	public static void createFromJSON(string jsonString, Cell[][] cells)
+	{
+		import std.json;
+		JSONValue json = parseJSON(jsonString);
+
+		if ("interconnected" in json)
+		{
+			interconnectedFromJSON(json["interconnected"].toString(), cells);
+		}
+
+		if ("multiSingle" in json)
+		{
+			multiSingleFromJSON(json["multiSingle"].toString(), cells);
+		}
+
+		if ("single" in json)
+		{
+			singleFromJSON(json["single"].toString(), cells);
+		}
+	}
+
+
+	private static void singleFromJSON(string jsonString, Cell[][] c)
+	{
+		import std.json;
+		JSONValue json = parseJSON(jsonString);
+
+		foreach (JSONValue value; json.array)
+		{
+			Cell cell1 = c[value["cell1"]["row"].integer][value["cell1"]["column"].integer];
+			Cell cell2 = c[value["cell2"]["row"].integer][value["cell2"]["column"].integer];
+			createSingle(cell1, cell2);
+		}
+	}
+
+
+	private static void multiSingleFromJSON(string jsonString, Cell[][] c)
+	{
+		import std.json;
+		JSONValue json = parseJSON(jsonString);
+
+		foreach (JSONValue value; json.array)
+		{
+			Cell cell = c[value["cell"]["row"].integer][value["cell"]["column"].integer];
+			Cell[] cells;
+			foreach (JSONValue group; value["group"].array)
+			{
+				cells ~= c[group["row"].integer][group["column"].integer];
+			}
+			createMultiSingle(cell, cells);
+		}
+	}
+
+
+	private static void interconnectedFromJSON(string jsonString, Cell[][] c)
+	{
+		import std.json;
+		JSONValue json = parseJSON(jsonString);
+
+		foreach (JSONValue value; json.array)
+		{
+			Cell[] cells;
+			foreach (JSONValue group; value["group"].array)
+			{
+				cells ~= c[group["row"].integer][group["column"].integer];
+			}
+			createInterconnected(cells);
+		}
+	}
+
+
 	/** Connect a Cell to this Constraint
 	 *
 	 * Params:

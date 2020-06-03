@@ -41,6 +41,15 @@ public abstract class Constraint : IConstraint
 		return _cells;
 	}
 
+	public static void createFromJSON(ConstraintType type, string jsonString, Cell[][] cells)
+	{
+		import core.constraint.unique : UniqueConstraint;
+		final switch (type)
+		{
+			case UniqueConstraint.getStaticConstraintType(): UniqueConstraint.createFromJSON(jsonString, cells); break;
+		}
+	}
+
 	protected Cell[] _cells;
 	protected ConstraintType _constraintType;
 }

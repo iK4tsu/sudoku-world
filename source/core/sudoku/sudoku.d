@@ -141,24 +141,24 @@ public class Sudoku
 	// TODO: core: Sudoku: finish toJson parsing
 	public static void toJson(SudokuBoard board)
 	{
+		JSONValue j;
+
+		// sudoku type
 		string sudokuType = board.type;
-		JSONValue j = ["sudokuType" : sudokuType];
+		j["sudoku"] = ["sudokuType" : sudokuType];
 
+		// sudoku grid
 		auto cells = board.toDigits();
-		j.object["sudoku"] = ["grid" : cells];
+		j["sudoku"]["grid"] = [cells];
 
+		// rules
 		auto rules = board.allRules;
 		j.object["sudoku"]["rules"] = rules;
 
-		import std.typecons : tuple;
-		auto dim = board.dimensions();
+		// TODO: core:sudoku:sudoku: add constraints in toJSON method
+		// constraints
 
-		j.object["rows"] = dim.rows;
-		j.object["columns"] = dim.columns;
-		j.object["boxRows"] = dim.boxRows;
-		j.object["boxColumns"] = dim.boxColumns;
-
-		// TODO: core:sudoku: implement file name
+		// TODO: core:sudoku:sudoku: implement file name
 		import std.file : write, exists, mkdir;
 		enum directory = "resources";
 		if (!directory.exists)
@@ -168,18 +168,69 @@ public class Sudoku
 		write(f, j.toJSON(true));
 	}
 
-	// TODO: core: sudoku: implement fromJson parsing
-	// FIXME: core: sudoku: change return type to Sudoku
-	public static bool fromJson(string file)
+	// TODO: core:sudoku:sudoku: add ui configs in the fromJSON method
+	public static Sudoku fromJSON(string file)
 	{
 		import std.file : FileException, exists, readText;
 		import std.exception : enforce;
 
-		if (!file.exists) return false;
+		if (!file.exists)
+		{
+			return null;
+		}
 
+		string s = readText(file);
 
+		JSONValue json = parseJSON(s);
+		JSONValue j = json["sudoku"].get!(JSONValue[string]);
 
-		return true;
+		// create a Sudoku instance
+		Sudoku sudoku = new Sudoku(Sudoku.toSudokuType(j["sudokuType"].str));
+
+		// build grid
+		int[][] grid;
+		foreach (JSONValue jsonArray; j["grid"].get!(JSONValue[]))
+		{
+			int[] row;
+			for (int i = 0; i < jsonArray.array.length; i++)
+			{
+				row ~= cast(int) jsonArray[i].integer;
+			}
+			grid ~= row;
+		}
+		sudoku.initialize(grid);
+
+		// rules
+		if ("rules" in j)
+		{
+			import core.rule.rule : Rule;
+			import core.ruleType : RuleType;
+			foreach (JSONValue value; j["rules"].get!(JSONValue[]))
+			{
+				RuleType type;
+				if ((type = Rule.toRuleType(value.str)) !is null)
+				{
+					Rule.createFromJSON(type, sudoku);
+				}
+			}
+		}
+
+		//constraints
+		if ("constraints" in j)
+		{
+			import core.constraint.constraint : Constraint, ConstraintType;
+			import std.traits : EnumMembers;
+			JSONValue jconstraints = j["constraints"];
+			foreach (enum type; EnumMembers!ConstraintType)
+			{
+				if (type in jconstraints)
+				{
+					Constraint.createFromJSON(type, jconstraints[type].toString(), sudoku.grid.cells);
+				}
+			}
+		}
+
+		return sudoku;
 	}
 
 
@@ -323,4 +374,107 @@ unittest
 									[9, 2, 5, 8, 4, 3, 1, 6, 7],
 									[3, 6, 4, 1, 7, 5, 9, 8, 2],
 									[8, 7, 1, 6, 9, 2, 5, 3, 4]]);
+}
+
+
+@("core:sudoku:sudoku: fromJSON constraints")
+unittest
+{
+	import std.conv : to;
+	int[][] puzzle = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+	const file = "temp.json";
+	string s = `{
+					"sudoku":{
+						"grid":`~puzzle.to!string~`,
+						"constraints":{
+							"Unique":{
+								"interconnected":[
+									{
+										"group":[
+											{"row":0,"column":0},
+											{"row":0,"column":1}]
+									},
+									{
+										"group":[
+											{"row":0,"column":0},
+											{"row":1,"column":0},
+											{"row":2,"column":0}]
+									}
+								],
+								"multiSingle":[
+									{
+										"cell":{"row":0,"column":1},
+										"group":[
+											{"row":0,"column":1},
+											{"row":1,"column":3},
+											{"row":2,"column":2}]
+									}
+								],
+								"single":[
+									{
+										"cell1":{"row":1,"column":1},
+										"cell2":{"row":2,"column":2}
+									}
+								]}},"sudokuType":"Sudoku 4x4"}}`;
+	JSONValue j = parseJSON(s);
+
+	import std.file : write, remove;
+	write(file, j.toJSON(true));
+
+	Sudoku sudoku = Sudoku.fromJSON(file);
+	assertTrue(sudoku.type == SudokuType.SUDOKU_4X4);
+	assertTrue(sudoku.grid.toDigit(sudoku.grid.cells) == puzzle);
+
+	import core.constraint.unique : UniqueConstraint;
+	Cell cell0 = sudoku.grid.cells[0][0];
+	Cell cell1 = sudoku.grid.cells[0][1];
+	Cell cell2 = sudoku.grid.cells[1][0];
+	Cell cell3 = sudoku.grid.cells[2][0];
+	assertTrue(cell0.get!UniqueConstraint !is null);
+	assertTrue(cell0.get!UniqueConstraint.cells.length == 4);
+	assertTrue(cell0.get!UniqueConstraint.cells == [cell0,cell1,cell2,cell3]);
+
+	Cell cell4 = sudoku.grid.cells[1][3];
+	Cell cell5 = sudoku.grid.cells[2][2];
+	assertTrue(cell1.get!UniqueConstraint.cells == [cell0,cell1,cell4,cell5]);
+	remove(file);
+}
+
+
+@("core:sudoku:sudoku: fromJSON rules")
+unittest
+{
+	import std.conv : to;
+	const file = "temp.json";
+	int[][] puzzle =   [[1, 0, 0, 3],
+						[0, 2, 1, 4],
+						[4, 0, 0, 2],
+						[0, 3, 4, 1]];
+
+	string s = `{
+					"sudoku":{
+						"grid":`~puzzle.to!string~`,
+						"rules":[
+							"Classic"
+						],
+						"sudokuType":"Sudoku 4x4"
+					}
+				}`;
+
+	JSONValue j = parseJSON(s);
+
+	import std.file : write, remove;
+	write(file, j.toJSON(true));
+
+	Sudoku sudoku = Sudoku.fromJSON(file);
+	remove(file);
+
+	assertTrue(sudoku.type == SudokuType.SUDOKU_4X4);
+	assertTrue(sudoku.grid.toDigit(sudoku.grid.cells) == puzzle);
+
+	int[][] solution = [[1,4,2,3],
+						[3,2,1,4],
+						[4,1,3,2],
+						[2,3,4,1]];
+	assertTrue(sudoku.solve == solution);
 }
