@@ -8,7 +8,6 @@ import core.rule.rule;
 import core.sudoku.cell;
 import core.sudoku.grid;
 import core.sudokuType;
-import ui.sudokuBoard;
 
 public class Sudoku
 {
@@ -139,33 +138,33 @@ public class Sudoku
 
 
 	// TODO: core: Sudoku: finish toJson parsing
-	public static void toJson(SudokuBoard board)
+	public static void toJson(/*GridUI board*/)
 	{
-		string sudokuType = board.type;
-		JSONValue j = ["sudokuType" : sudokuType];
+		// SudokuType sudokuType = board.type;
+		// JSONValue j = ["sudokuType" : sudokuType];
 
-		auto cells = board.toDigits();
-		j.object["sudoku"] = ["grid" : cells];
+		// auto cells = board.toDigits();
+		// j.object["sudoku"] = ["grid" : cells];
 
-		auto rules = board.allRules;
-		j.object["sudoku"]["rules"] = rules;
+		// auto rules = board.allRules;
+		// j.object["sudoku"]["rules"] = rules;
 
-		import std.typecons : tuple;
-		auto dim = board.dimensions();
+		// import std.typecons : tuple;
+		// auto dim = dimension(sudokuType);
 
-		j.object["rows"] = dim.rows;
-		j.object["columns"] = dim.columns;
-		j.object["boxRows"] = dim.boxRows;
-		j.object["boxColumns"] = dim.boxColumns;
+		// j.object["rows"] = dim.rows;
+		// j.object["columns"] = dim.columns;
+		// j.object["boxRows"] = dim.boxRows;
+		// j.object["boxColumns"] = dim.boxColumns;
 
-		// TODO: core:sudoku: implement file name
-		import std.file : write, exists, mkdir;
-		enum directory = "resources";
-		if (!directory.exists)
-			mkdir(directory);
+		// // TODO: core:sudoku: implement file name
+		// import std.file : write, exists, mkdir;
+		// enum directory = "resources";
+		// if (!directory.exists)
+		// 	mkdir(directory);
 
-		auto f = directory~"/"~"puzzle"~sudokuType~".json";
-		write(f, j.toJSON(true));
+		// auto f = directory~"/"~"puzzle"~sudokuType~".json";
+		// write(f, j.toJSON(true));
 	}
 
 	// TODO: core: sudoku: implement fromJson parsing
@@ -183,28 +182,28 @@ public class Sudoku
 	}
 
 
-	public static Sudoku fromSudokuBoard(SudokuBoard board)
-	{
-		import core.ruleType;
-		import core.rule.classic;
+	// public static Sudoku fromGridUI(GridUI board)
+	// {
+	// 	import core.ruleType;
+	// 	import core.rule.classic;
 
-		Sudoku s = new Sudoku(board.type);
-		s.initialize(board.toDigits());
+	// 	Sudoku s = new Sudoku(board.type);
+	// 	s.initialize(board.toDigits());
 
-		// rules
-		foreach (rule; board.allRules)
-		{
-			final switch (rule)
-			{
-				case RuleType.CLASSIC:
-					s.add(new ClassicRule());
-					break;
-			}
-		}
+	// 	// rules
+	// 	foreach (rule; board.allRules)
+	// 	{
+	// 		final switch (rule)
+	// 		{
+	// 			case RuleType.CLASSIC:
+	// 				s.add(new ClassicRule());
+	// 				break;
+	// 		}
+	// 	}
 
-		// constraints
-		return s;
-	}
+	// 	// constraints
+	// 	return s;
+	// }
 
 
 	public int rows;

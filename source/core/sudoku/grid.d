@@ -193,6 +193,18 @@ public class Grid
 	}
 
 
+	public Cell cell(int row, int column)
+	{
+		return cells[row][column];
+	}
+
+
+	public auto opIndex(int row, int column)
+	{
+		return cell(row, column);
+	}
+
+
 	/** Position of the next cell
 	 *
 	 * This is used internaly by the backtrackAlgorithm

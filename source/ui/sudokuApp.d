@@ -13,9 +13,11 @@ import gtk.Button;
 import gtk.CssProvider;
 import gtk.Stack;
 import gtk.StyleContext;
+import gtk.Widget;
 import gtk.Window;
 
-import ui.actions.createAction;
+import controllers.sudokuWorld;
+import ui.menus.createMenu;
 
 class SudokuApp : Application
 {
@@ -24,7 +26,7 @@ class SudokuApp : Application
 		ApplicationFlags flags = ApplicationFlags.FLAGS_NONE;
 		super("org.sudokuworld.ui", flags);
 		this.addOnActivate(&onSudokuGUIActivate);
-		this.window = null;
+		this._window = null;
 	}
 
 
@@ -53,7 +55,7 @@ class SudokuApp : Application
 	private void loadGlade()
 	{
 		trace("Loading Glade...");
-		builder = new Builder();
+		_builder = new Builder();
 		if (!builder.addFromFile("data/window.glade"))
 		{
 			critical("window.glade file cannot be found, aborting...");
@@ -66,7 +68,7 @@ class SudokuApp : Application
 	private void loadTopLevel()
 	{
 		trace("Loading top level...");
-		window = cast(ApplicationWindow) builder.getObject("window");
+		_window = cast(ApplicationWindow) builder.getObject("window");
 		window.setApplication(this);
 	}
 
@@ -87,42 +89,84 @@ class SudokuApp : Application
 	private void initGUI()
 	{
 		trace("Initializing GUI");
-		// Main menu
-			// widgets
-		auto btnExit   = cast(Button) builder.getObject("btnExit");
-		auto btnCreate = cast(Button) builder.getObject("btnCreate");
-		stkMenu        = cast(Stack)  builder.getObject("stackMenu");
-		boxMenu        = cast(Box)    builder.getObject("boxMenu");
-		boxChoice      = cast(Box)    builder.getObject("boxChoice");
+		btnCreate = cast(Button) builder.getObject("btnCreate");
+		btnExit = cast(Button) builder.getObject("btnExit");
+		btnPlay = cast(Button) builder.getObject("btnPlay");
+		btnSettings = cast(Button) builder.getObject("btnSettings");
+		stkMenu = cast(Stack) builder.getObject("stackMenu");
+		boxMenu = cast(Box) builder.getObject("boxMenu");
+		boxChoice = cast(Box) builder.getObject("boxChoice");
 
-			// callbacks
-		btnExit.addOnClicked(delegate void(Button) { this.quit(); } );
-		btnCreate.addOnClicked(&onBtnCreateClicked);
-
-		// Create Menu
-		this.createAction = new CreateAction(window, builder);
+		sudokuWorld = new SudokuWorld(this);
 	}
 
 
-	/** This is called when `btnCreate` is clicked in the main menu
-	 *
-	 * Makes the create menu content `Stack` visible
-	 */
-	private void onBtnCreateClicked(Button)
+
+// signals
+
+	public void setOnBtnCreateClicked(void delegate(Button) dg)
+	{
+		btnCreate.addOnClicked(dg);
+	}
+
+
+	public void setOnBtnExitClicked(void delegate(Button) dg)
+	{
+		btnExit.addOnClicked(dg);
+	}
+
+
+	public void setOnBtnPlayClicked(void delegate(Button) dg)
+	{
+		btnPlay.addOnClicked(dg);
+	}
+
+
+	public void setOnBtnSettingsClicked(void delegate(Button) dg)
+	{
+		btnSettings.addOnClicked(dg);
+	}
+
+
+	public void setOnButtonPress(bool delegate(GdkEventButton*, Widget) dg)
+	{
+		window.addOnButtonPress(dg);
+	}
+
+
+
+// functions
+
+	public void showCreateMenu()
 	{
 		stkMenu.setVisibleChild(boxChoice);
 	}
 
 
-	private ApplicationWindow window;
-	private Builder builder;
 
-	// Actions
-	private CreateAction createAction;
+// getters/setters
 
-	// Widgets
-		// Menu
-	private Stack stkMenu;
+	public auto builder() @property
+	{
+		return _builder;
+	}
+
+
+	public auto window() @property
+	{
+		return _window;
+	}
+
+
+	private ApplicationWindow _window;
+	private Builder _builder;
+	private SudokuWorld sudokuWorld;
+
 	private Box boxMenu;
 	private Box boxChoice;
+	private Button btnCreate;
+	private Button btnExit;
+	private Button btnPlay;
+	private Button btnSettings;
+	private Stack stkMenu;
 }

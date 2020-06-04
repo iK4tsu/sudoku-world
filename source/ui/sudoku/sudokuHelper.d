@@ -1,9 +1,9 @@
-module ui.sudokuHelper;
+module ui.sudoku.sudokuHelper;
 
 import std.algorithm : canFind, countUntil, remove, sort;
 import std.experimental.logger;
 
-import ui.sudokuCell;
+import ui.sudoku.cellUI;
 
 public class SudokuHelper
 {
