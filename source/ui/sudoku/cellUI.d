@@ -24,7 +24,6 @@ import gtk.Widget;
 
 import core.sudoku.cell;
 import core.sudoku.sudoku;
-import core.sudokuType;
 import ui.sudoku.gridUI;
 import ui.sudoku.sudokuHelper;
 
@@ -72,9 +71,9 @@ public class CellUI : DrawingArea
 	{
 		final switch(type)
 		{
-			case SudokuType.SUDOKU_4X4: return tuple(150,150);
-			case SudokuType.SUDOKU_6X6: return tuple(100,100);
-			case SudokuType.SUDOKU_9X9: return tuple(65,65);
+			case SudokuType.Sudoku_4X4: return tuple(150,150);
+			case SudokuType.Sudoku_6X6: return tuple(100,100);
+			case SudokuType.Sudoku_9X9: return tuple(65,65);
 		}
 	}
 

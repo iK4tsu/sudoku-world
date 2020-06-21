@@ -7,7 +7,14 @@ import std.typecons : tuple;
 import core.rule.rule;
 import core.sudoku.cell;
 import core.sudoku.grid;
-import core.sudokuType;
+
+
+public enum SudokuType
+{
+	Sudoku_4X4,
+	Sudoku_6X6,
+	Sudoku_9X9,
+}
 
 public class Sudoku
 {
@@ -89,30 +96,6 @@ public class Sudoku
 	}
 
 
-	/** SudokuType from string
-	 *
-	 * Gets a SudokuType based on the input string.
-	 * SudokuType is of type string so it's easy to compare it's value.
-	 * This is useful when using the GtkComboBox value strings.
-	 *
-	 * Params:
-	 *     typeString = string to compare
-	 *
-	 * Returns:
-	 *     `SudokuType` if typeString is a valid string \
-	 *     `null` otherwise
-	 */
-	public static SudokuType toSudokuType(string typeString)
-	{
-		import std.traits : EnumMembers;
-		foreach (type; EnumMembers!SudokuType)
-			if (type == typeString)
-				return type;
-
-		return null;
-	}
-
-
 	/** Standard Sudoku dimensions
 	 *
 	 * Params:
@@ -125,13 +108,13 @@ public class Sudoku
 	{
 		final switch (type)
 		{
-			case SudokuType.SUDOKU_4X4:
+			case SudokuType.Sudoku_4X4:
 				return tuple!("rows","columns","boxRows","boxColumns")(4,4,2,2);
 
-			case SudokuType.SUDOKU_6X6:
+			case SudokuType.Sudoku_6X6:
 				return tuple!("rows","columns","boxRows","boxColumns")(6,6,2,3);
 
-			case SudokuType.SUDOKU_9X9:
+			case SudokuType.Sudoku_9X9:
 				return tuple!("rows","columns","boxRows","boxColumns")(9,9,3,3);
 		}
 	}
@@ -180,30 +163,6 @@ public class Sudoku
 
 		return true;
 	}
-
-
-	// public static Sudoku fromGridUI(GridUI board)
-	// {
-	// 	import core.ruleType;
-	// 	import core.rule.classic;
-
-	// 	Sudoku s = new Sudoku(board.type);
-	// 	s.initialize(board.toDigits());
-
-	// 	// rules
-	// 	foreach (rule; board.allRules)
-	// 	{
-	// 		final switch (rule)
-	// 		{
-	// 			case RuleType.CLASSIC:
-	// 				s.add(new ClassicRule());
-	// 				break;
-	// 		}
-	// 	}
-
-	// 	// constraints
-	// 	return s;
-	// }
 
 
 	public int rows;

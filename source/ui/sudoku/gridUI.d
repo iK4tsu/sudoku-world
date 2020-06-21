@@ -11,7 +11,6 @@ import gtk.Label;
 import gtk.StyleContext;
 
 import core.sudoku.sudoku;
-import core.sudokuType : SudokuType;
 import core.ruleType : RuleType;
 import ui.sudoku.boxUI;
 import ui.sudoku.cellUI;
@@ -93,10 +92,10 @@ public class GridUI : Grid
 	{
 		final switch(type)
 		{
-			case SudokuType.SUDOKU_4X4:
-			case SudokuType.SUDOKU_6X6:
+			case SudokuType.Sudoku_4X4:
+			case SudokuType.Sudoku_6X6:
 				return tuple(600,600);
-			case SudokuType.SUDOKU_9X9:
+			case SudokuType.Sudoku_9X9:
 				return tuple(585,585);
 		}
 	}

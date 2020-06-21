@@ -25,8 +25,8 @@ import gtk.Window;
 
 import controllers.sudokuController : GameState;
 import core.ruleType;
-import core.sudoku.sudoku;
-import core.sudokuType;
+import core.sudoku.sudoku : SudokuType;
+import extra : toEnumString;
 import ui.sudoku.gridUI;
 
 class CreateMenu
@@ -63,7 +63,7 @@ class CreateMenu
 		foreach (i, type; EnumMembers!SudokuType)
 		{
 			auto iter = list.createIter();
-			list.setValue(iter, 0, type);
+			list.setValue(iter, 0, type.toEnumString());
 			static if (i == 0)
 			{
 				cbSudokuType.setActiveIter(iter);

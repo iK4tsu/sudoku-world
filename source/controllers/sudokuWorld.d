@@ -9,7 +9,6 @@ import controllers.createMenuController;
 import controllers.sudokuController;
 import core.sudoku.grid;
 import core.sudoku.sudoku;
-import core.sudokuType;
 import ui.menus.createMenu;
 import ui.sudoku.gridUI;
 import ui.sudokuApp;
