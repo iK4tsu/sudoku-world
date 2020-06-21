@@ -11,7 +11,7 @@ import gtk.Label;
 import gtk.StyleContext;
 
 import core.sudoku.sudoku;
-import core.ruleType : RuleType;
+import core.rule.rule : RuleType;
 import ui.sudoku.boxUI;
 import ui.sudoku.cellUI;
 

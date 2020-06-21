@@ -24,7 +24,7 @@ import gtk.TreeIter;
 import gtk.Window;
 
 import controllers.sudokuController : GameState;
-import core.ruleType;
+import core.rule.rule : RuleType;
 import core.sudoku.sudoku : SudokuType;
 import extra : toEnumString;
 import ui.sudoku.gridUI;
@@ -77,7 +77,7 @@ class CreateMenu
 	{
 		foreach (type; EnumMembers!RuleType)
 		{
-			auto ckBtn = new CheckButton(type);
+			auto ckBtn = new CheckButton(type.toEnumString());
 			btnBoxRules.packStart(ckBtn, true, true, 0);
 		}
 		btnBoxRules.showAll();
@@ -169,7 +169,7 @@ class CreateMenu
 	{
 		foreach (CheckButton child; getBtnBoxRulesChildren())
 		{
-			if (child.getLabel() == RuleType.CLASSIC)
+			if (child.getLabel() == RuleType.Classic.toEnumString())
 			{
 				continue;
 			}

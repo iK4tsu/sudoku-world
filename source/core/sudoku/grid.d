@@ -234,6 +234,20 @@ public class Grid
 			return tuple!("row","column")(row, column + 1);
 	}
 
+
+	/** Converts Cell matrix to a Cell array
+	 *
+	 * Concatenates each Cell row
+	 *
+	 * Returns:
+	 *     `Cell[]` with each Cell in cells
+	 */
+	public Cell[] toArray()
+	{
+		import std.array: join;
+		return cells.join;
+	}
+
 	public int height;
 	public int width;
 	public int boxHeight;

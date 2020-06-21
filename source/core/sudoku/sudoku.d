@@ -37,26 +37,6 @@ public class Sudoku
 	}
 
 
-	public void add(Rule rule)
-	{
-		import std.algorithm : canFind;
-		if (rule is null || canFind(rules,rule))
-			return;
-
-		rules ~= rule;
-		rule.connect(this);
-	}
-
-
-	public void add(Rule[] rules...)
-	{
-		foreach (rule; rules)
-		{
-			add(rule);
-		}
-	}
-
-
 	public auto solve()
 	{
 		backtrackAlgorithm(0,0);
@@ -172,113 +152,144 @@ public class Sudoku
 
 	public SudokuType type;
 	public Grid grid;
-	public Rule[] rules;
 	public int[][] solution;
 }
 
 
 version(unittest) { import aurorafw.unit; }
 
+version(unittest)
+{
+	import core.rule.rule : addRuleClassic;
+
+	int[][] classic4x4 =   [[1, 0, 0, 3],
+							[0, 2, 1, 4],
+							[4, 0, 0, 2],
+							[0, 3, 4, 1]];
+
+	int[][] classicSolve4x4 =  [[1, 4, 2, 3],
+								[3, 2, 1, 4],
+								[4, 1, 3, 2],
+								[2, 3, 4, 1]];
+
+	int[][] classic6x6 =   [[0, 0, 3, 0, 1, 0],
+							[5, 6, 0, 3, 2, 0],
+							[0, 5, 4, 2, 0, 3],
+							[2, 0, 6, 4, 5, 0],
+							[0, 1, 2, 0, 4, 5],
+							[0, 4, 0, 1, 0, 0]];
+
+	int[][] classicSolve6x6 =  [[4, 2, 3, 5, 1, 6],
+								[5, 6, 1, 3, 2, 4],
+								[1, 5, 4, 2, 6, 3],
+								[2, 3, 6, 4, 5, 1],
+								[3, 1, 2, 6, 4, 5],
+								[6, 4, 5, 1, 3, 2]];
+
+	int[][] classic9x9 =  [[0, 0, 3, 2, 6, 0, 0, 0, 0],
+								[0, 0, 7, 0, 0, 1, 0, 2, 3],
+								[0, 8, 6, 0, 0, 0, 4, 0, 0],
+								[5, 0, 0, 0, 0, 8, 0, 9, 0],
+								[6, 4, 0, 3, 0, 7, 0, 1, 0],
+								[0, 0, 0, 0, 0, 0, 0, 0, 5],
+								[9, 2, 0, 0, 4, 0, 0, 0, 7],
+								[0, 0, 0, 0, 0, 5, 9, 8, 0],
+								[0, 0, 1, 6, 0, 0, 0, 3, 0]];
+
+	int[][] classicSolve9x9 =  [[1, 5, 3, 2, 6, 4, 8, 7, 9],
+								[4, 9, 7, 5, 8, 1, 6, 2, 3],
+								[2, 8, 6, 7, 3, 9, 4, 5, 1],
+								[5, 3, 2, 4, 1, 8, 7, 9, 6],
+								[6, 4, 9, 3, 5, 7, 2, 1, 8],
+								[7, 1, 8, 9, 2, 6, 3, 4, 5],
+								[9, 2, 5, 8, 4, 3, 1, 6, 7],
+								[3, 6, 4, 1, 7, 5, 9, 8, 2],
+								[8, 7, 1, 6, 9, 2, 5, 3, 4]];
+}
+
 @("core:sudoku:sudoku: classic solve 4x4")
 unittest
 {
-	import core.rule.classic;
+	Sudoku sudoku = new Sudoku(SudokuType.Sudoku_4X4);
 
-	Sudoku sudoku = new Sudoku(SudokuType.SUDOKU_4X4);
+	sudoku.initialize(classic4x4);
+	addRuleClassic(sudoku.grid);
 
-	int[][] digits =   [[1, 0, 0, 3],
-						[0, 2, 1, 4],
-						[4, 0, 0, 2],
-						[0, 3, 4, 1]];
-
-	sudoku.initialize(digits);
-	sudoku.add(new ClassicRule());
-
-	assertTrue(sudoku.solve() ==   [[1, 4, 2, 3],
-									[3, 2, 1, 4],
-									[4, 1, 3, 2],
-									[2, 3, 4, 1]]);
+	assertTrue(sudoku.solve() == classicSolve4x4);
 }
 
 @("core:sudoku:sudoku: classic solve 6x6")
 unittest
 {
-	import core.rule.classic;
+	Sudoku sudoku = new Sudoku(SudokuType.Sudoku_6X6);
 
-	Sudoku sudoku = new Sudoku(SudokuType.SUDOKU_6X6);
+	sudoku.initialize(classic6x6);
+	addRuleClassic(sudoku.grid);
 
-	int[][] digits =   [[0, 0, 3, 0, 1, 0],
-						[5, 6, 0, 3, 2, 0],
-						[0, 5, 4, 2, 0, 3],
-						[2, 0, 6, 4, 5, 0],
-						[0, 1, 2, 0, 4, 5],
-						[0, 4, 0, 1, 0, 0]];
-
-	sudoku.initialize(digits);
-	sudoku.add(new ClassicRule());
-
-	assertTrue(sudoku.solve() ==   [[4, 2, 3, 5, 1, 6],
-									[5, 6, 1, 3, 2, 4],
-									[1, 5, 4, 2, 6, 3],
-									[2, 3, 6, 4, 5, 1],
-									[3, 1, 2, 6, 4, 5],
-									[6, 4, 5, 1, 3, 2]]);
+	assertTrue(sudoku.solve() == classicSolve6x6);
 }
-
-
-@("core:sudoku:sudoku: classic solve 6x6")
-unittest
-{
-	import core.rule.classic;
-
-	Sudoku sudoku = new Sudoku(SudokuType.SUDOKU_6X6);
-
-	int[][] digits =   [[2, 0, 0, 0, 0, 0],
-						[3, 0, 0, 4, 5, 2],
-						[0, 5, 2, 3, 0, 6],
-						[4, 6, 3, 0, 1, 0],
-						[0, 2, 0, 0, 0, 4],
-						[0, 0, 4, 5, 2, 0]];
-
-	sudoku.initialize(digits);
-	sudoku.add(new ClassicRule());
-
-	assertTrue(sudoku.solve() ==   [[2, 4, 5, 1, 6, 3],
-									[3, 1, 6, 4, 5, 2],
-									[1, 5, 2, 3, 4, 6],
-									[4, 6, 3, 2, 1, 5],
-									[5, 2, 1, 6, 3, 4],
-									[6, 3, 4, 5, 2, 1]]);
-}
-
 
 @("core:sudoku:sudoku: classic solve 9x9")
 unittest
 {
-	import core.rule.classic;
+	Sudoku sudoku = new Sudoku(SudokuType.Sudoku_9X9);
 
-	Sudoku sudoku = new Sudoku(SudokuType.SUDOKU_9X9);
+	sudoku.initialize(classic9x9);
+	addRuleClassic(sudoku.grid);
 
-	auto digits =  [[0, 0, 3, 2, 6, 0, 0, 0, 0],
-					[0, 0, 7, 0, 0, 1, 0, 2, 3],
-					[0, 8, 6, 0, 0, 0, 4, 0, 0],
-					[5, 0, 0, 0, 0, 8, 0, 9, 0],
-					[6, 4, 0, 3, 0, 7, 0, 1, 0],
-					[0, 0, 0, 0, 0, 0, 0, 0, 5],
-					[9, 2, 0, 0, 4, 0, 0, 0, 7],
-					[0, 0, 0, 0, 0, 5, 9, 8, 0],
-					[0, 0, 1, 6, 0, 0, 0, 3, 0]];
+	assertTrue(sudoku.solve() == classicSolve9x9);
+}
 
-	sudoku.initialize(digits);
-	sudoku.add(new ClassicRule());
 
-	assertTrue(sudoku.solve() ==   [[1, 5, 3, 2, 6, 4, 8, 7, 9],
-									[4, 9, 7, 5, 8, 1, 6, 2, 3],
-									[2, 8, 6, 7, 3, 9, 4, 5, 1],
-									[5, 3, 2, 4, 1, 8, 7, 9, 6],
-									[6, 4, 9, 3, 5, 7, 2, 1, 8],
-									[7, 1, 8, 9, 2, 6, 3, 4, 5],
-									[9, 2, 5, 8, 4, 3, 1, 6, 7],
-									[3, 6, 4, 1, 7, 5, 9, 8, 2],
-									[8, 7, 1, 6, 9, 2, 5, 3, 4]]);
+version(unittest)
+{
+	import core.rule.rule : addRuleX;
+
+	int[][] x4x4 = [[1,2,0,0],
+					[0,0,0,0],
+					[0,0,0,0],
+					[0,0,4,3]];
+
+	int[][] xSolve4x4 =    [[1,2,3,4],
+							[3,4,1,2],
+							[4,3,2,1],
+							[2,1,4,3]];
+
+	int[][] x6x6 = [[0,0,1,0,0,0],
+					[0,0,0,6,0,0],
+					[1,0,0,0,3,0],
+					[0,4,0,0,0,2],
+					[0,0,2,0,0,0],
+					[0,0,0,2,0,0]];
+
+	int[][] xSolve6x6 =    [[2,6,1,5,4,3],
+							[5,3,4,6,2,1],
+							[1,2,6,4,3,5],
+							[3,4,5,1,6,2],
+							[4,1,2,3,5,6],
+							[6,5,3,2,1,4]];
+}
+
+@("core:sudoku:sudoku: x solve 4x4")
+unittest
+{
+	Sudoku sudoku = new Sudoku(SudokuType.Sudoku_4X4);
+
+	sudoku.initialize(x4x4);
+	addRuleClassic(sudoku.grid);
+	addRuleX(sudoku.grid);
+
+	assertTrue(sudoku.solve() == xSolve4x4);
+}
+
+@("core:sudoku:sudoku: x solve 6x6")
+unittest
+{
+	Sudoku sudoku = new Sudoku(SudokuType.Sudoku_6X6);
+
+	sudoku.initialize(x6x6);
+	addRuleClassic(sudoku.grid);
+	addRuleX(sudoku.grid);
+
+	assertTrue(sudoku.solve() == xSolve6x6);
 }
