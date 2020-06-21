@@ -13,6 +13,8 @@
     "sourcePaths": ["source"],
     "importPaths": ["source"],
 
+    "buildOptions": ["optimize"],
+
     "dependencies": {
         "gtk-d:gtkd": "~>3.9.0",
         "aurorafw:unit": "~>0.0.1-alpha.4"
