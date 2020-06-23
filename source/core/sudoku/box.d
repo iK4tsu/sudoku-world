@@ -1,15 +1,18 @@
 module core.sudoku.box;
 
+import std.array: join;
+
 import core.sudoku.cell;
+import core.sudoku.grid;
 
 public class Box
 {
-	public this(int height, int width)
+	public this(in int rows, in int columns)
 	{
-		this.width = width;
-		this.height = height;
+		this.columns = columns;
+		this.rows = rows;
 
-		cells = new Cell[][](height, width);
+		cells = new Cell[][](rows, columns);
 	}
 
 
@@ -28,12 +31,24 @@ public class Box
 	 */
 	public Cell[] toArray()
 	{
-		import std.array: join;
-		return cells.join;
+		return Grid.toArray(cells);
 	}
 
-	public int width;
-	public int height;
+
+	/** Get Cell digits
+	 *
+	 * Params:
+	 *     cells = matrix of Cells to analyse
+	 *
+	 * Returns:
+	 *     `int[][]` with the current digits stored in each Cell of cells
+	 */
+	public int[][] toDigit()
+	{
+		return Grid.toDigit(cells);
+	}
 
 	public Cell[][] cells;
+	public const int columns;
+	public const int rows;
 }
