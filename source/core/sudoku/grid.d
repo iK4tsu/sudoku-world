@@ -1,51 +1,123 @@
 module core.sudoku.grid;
 
+import std.algorithm : map;
+import std.array : array, join;
+import std.range : iota, front, transversal;
+import std.typecons : tuple, Tuple;
+
 import core.sudoku.box;
 import core.sudoku.cell;
 
+public enum SudokuType
+{
+	Sudoku4x4,
+	Sudoku6x6,
+	Sudoku9x9,
+}
+
 public class Grid
 {
-	public this(int height, int width, int boxHeight, int boxWidth)
+	///
+	public this(in SudokuType type)
 	{
-		this.height = height;
-		this.width = width;
-		this.boxHeight = boxHeight;
-		this.boxWidth = boxWidth;
+		this.type = type;
+		const auto dim = dimensions(type);
+		this.rows = dim.rows;
+		this.columns = dim.columns;
+		this.boxRows = dim.boxRows;
+		this.boxColumns = dim.boxColumns;
 
-		boxes = new Box[][](boxWidth, boxHeight);
-		cells = new Cell[][](height, width);
-
-		for (int row; row < boxWidth; row++)
-			for (int col; col < boxHeight; col++)
-				boxes[row][col] = new Box(boxHeight, boxWidth);
+		buildGrid();
 	}
 
 
-	public void initialize(int[][] digits)
+	private void buildGrid()
 	{
-		for (int row; row < width; row++)
+		boxes = new Box[][](boxColumns, boxRows);
+		cells = new Cell[][](rows, columns);
+
+		for (int row; row < boxColumns; row++)
+			for (int col; col < boxRows; col++)
+				boxes[row][col] = new Box(boxRows, boxColumns);
+	}
+
+
+	/** Standard Sudoku dimensions
+	 *
+	 * Params:
+	 *     type = SudokuType to process
+	 *
+	 * Returns: `tuple`***("rows","columns","boxRows","boxColumns")*** with the
+	 *     dimensions of SudokuType
+	 */
+	public static auto dimensions(in SudokuType type)
+	{
+		final switch (type)
 		{
-			for (int col; col < height; col++)
+			case SudokuType.Sudoku4x4:
+				return tuple!("rows","columns","boxRows","boxColumns")(4,4,2,2);
+
+			case SudokuType.Sudoku6x6:
+				return tuple!("rows","columns","boxRows","boxColumns")(6,6,2,3);
+
+			case SudokuType.Sudoku9x9:
+				return tuple!("rows","columns","boxRows","boxColumns")(9,9,3,3);
+		}
+	}
+
+
+	/** Get the Grid dimensions
+	 *
+	 * Returns: `tuple`***("rows","columns","boxRows","boxColumns")***
+	 */
+	public auto dimensions() const
+	{
+		return tuple!("rows","columns","boxRows","boxColumns")(rows,columns,boxRows,boxColumns);
+	}
+
+
+	/** Initialize every Cell to 0
+	 *
+	 * Creates a matrix of [`rows`][`columns`] size
+	 *
+	 * See_Also: void initialize(**int[][] digits**)
+	 */
+	public void initialize()
+	{
+		initialize(new int[][](rows, columns));
+	}
+
+
+	/** Initialize Cells to digits
+	 *
+	 * Be sure to pass a matrix of at least [`rows`][`columns`] in size \
+	 * Only `rows*columns` will be read from digits starting from [0][0]
+	 *
+	 * Params:
+	 *     digits: matrix with the data to initialize
+	 */
+	public void initialize(in int[][] digits)
+	{
+		for (int row; row < columns; row++)
+		{
+			for (int col; col < rows; col++)
 			{
 				cells[row][col] = new Cell(digits[row][col]);
 			}
 		}
-
-		import std.array : array;
-		import std.algorithm : map;
 
 		// this must be inverted
 		// a Sudoku of 6x6 is composed of a grid of 3x2 and boxes of 2x3
 		// a Sudoku of 8x8 is composed of a grid of 4x2 and boxes of 2x4
 		//     which means that the boxes inside the main grid are trasposed
 		//     this is true to 4x4 and 9x9 as well (actualy it's true for all)
-		for (int row; row < boxWidth; row++)
+		for (int row; row < boxColumns; row++)
 		{
-			for (int col; col < boxHeight; col++)
+			for (int col; col < boxRows; col++)
 			{
-				auto cellRow = row*boxHeight;
-				auto cellCol = col*boxWidth;
-				Cell[][] _cells = cells.map!(x => x[cellCol .. cellCol + boxWidth])[cellRow .. cellRow + boxHeight].array;
+				auto cellRow = row*boxRows;
+				auto cellCol = col*boxColumns;
+				Cell[][] _cells = cells.map!(x => x[cellCol .. cellCol + boxColumns])[cellRow .. cellRow + boxRows].array;
 				boxes[row][col].initialize(_cells);
 			}
 		}
@@ -57,7 +129,7 @@ public class Grid
 	 * Returns:
 	 *     `int[][]` with all the current digits stored in each Cell
 	 */
-	public auto toDigit()
+	public int[][] toDigit()
 	{
 		return toDigit(cells);
 	}
@@ -71,16 +143,9 @@ public class Grid
 	 * Returns:
 	 *     `int[][]` with the current digits stored in each Cell of cells
 	 */
-	public static auto toDigit(Cell[][] cells)
+	public static int[][] toDigit(Cell[][] cells)
 	{
-		import std.algorithm : map;
-		import std.array : array;
-		int[][] ret;
-		for (int i; i < cells.length; i++)
-		{
-			ret ~= cells[i].map!(x => x.digit).array;
-		}
-		return ret;
+		return cells.map!(row => row.map!(cell => cell.digit).array).array;
 	}
 
 
@@ -92,11 +157,9 @@ public class Grid
 	 * Returns:
 	 *     `int[]` with the current digits stored in each Cell of cells
 	 */
-	public static auto toDigit(Cell[] cells)
+	public static int[] toDigit(Cell[] cells)
 	{
-		import std.algorithm : map;
-		import std.array : array;
-		return cells.map!(x => x.digit).array;
+		return cells.map!(cell => cell.digit).array;
 	}
 
 
@@ -111,7 +174,7 @@ public class Grid
 	public Cell[] row(in int index)
 	in
 	{
-		assert(index >= 0 && index < width, "index out of bounds");
+		assert(index >= 0 && index < columns, "index out of bounds");
 	}
 	body
 	{
@@ -130,14 +193,11 @@ public class Grid
 	public Cell[] column(in int index)
 	in
 	{
-		assert(index >= 0 && index < height, "index out of bounds");
+		assert(index >= 0 && index < rows, "index out of bounds");
 	}
 	body
 	{
-		import std.algorithm: map;
-		import std.array: array;
-
-		return cells.map!(x => x[index]).array;
+		return transversal(cells, index).array;
 	}
 
 
@@ -152,11 +212,10 @@ public class Grid
 	public Box box(in int index)
 	in
 	{
-		assert(index >= 0 && index < width, "index out of bounds");
+		assert(index >= 0 && index < columns, "index out of bounds");
 	}
 	body
 	{
-		import std.array : join;
 		return boxes.join[index];
 	}
 
@@ -169,7 +228,7 @@ public class Grid
 	public Cell[] mainDiagonal()
 	{
 		Cell[] ret;
-		for (int i; i < width; i++)
+		foreach (i; 0..rows)
 		{
 			ret ~= cells[i][i];
 		}
@@ -185,53 +244,44 @@ public class Grid
 	public Cell[] antiDiagonal()
 	{
 		Cell[] ret;
-		for (int i; i < width; i++)
+		for (int i; i < columns; i++)
 		{
-			ret ~= cells[i][width-i-1];
+			ret ~= cells[i][columns-i-1];
 		}
 		return ret;
 	}
 
 
-	public Cell cell(int row, int column)
+	/** Get the Cell contained in the correspondent coordenates
+	 *
+	 * Params:
+	 *     row: row in the matrix
+	 *     column: column in the matrix
+	 *
+	 * See_Also: auto opIndex(**int row, int column**)
+	 */
+	public Cell cell(in int row, in int column)
 	{
 		return cells[row][column];
 	}
 
 
-	public auto opIndex(int row, int column)
-	{
-		return cell(row, column);
-	}
-
-
-	/** Position of the next cell
-	 *
-	 * This is used internaly by the backtrackAlgorithm
+	/** Get the Cell contained in the correspondent coordenates
 	 *
 	 * Params:
-	 *     row = current row int the Grid
-	 *     column = current column int the Grid
+	 *     row: row in the matrix
+	 *     column: column in the matrix
 	 *
-	 * Returns:
-	 *     `tuple`***("row","column")*** with the position of the next Cell \
-	 *     `tuple`***("row","column")(-1,-1)*** if params correspond to the last Cell
+	 * Examples:
+	 * --------------------
+	 * Grid grid = new Grid(SudokuType.Sudoku4x4);
+	 * grid.initialize();
+	 * Cell cell = grid[0,0];
+	 * --------------------
 	 */
-	public auto nextCell(int row, int column)
+	public auto opIndex(in int row, in int column)
 	{
-		import std.typecons : tuple;
-
-		// last cell of grid
-		if (row == height - 1 && column == width - 1)
-			return tuple!("row","column")(-1,-1);
-
-		// last cell of column
-		else if (column == width - 1)
-			return tuple!("row","column")(row + 1, 0);
-
-		// cell in the middle
-		else
-			return tuple!("row","column")(row, column + 1);
+		return cell(row, column);
 	}
 
 
@@ -244,63 +294,183 @@ public class Grid
 	 */
 	public Cell[] toArray()
 	{
-		import std.array: join;
+		return toArray(cells);
+	}
+
+
+	public static Cell[] toArray(Cell[][] cells)
+	{
 		return cells.join;
 	}
 
-	public int height;
-	public int width;
-	public int boxHeight;
-	public int boxWidth;
+
+	/** Get the transposed Cells
+	 *
+	 * Returns:
+	 *     `Cell[][]`
+	 */
+	public Cell[][] transposed()
+	{
+		Cell[][] ret;
+		foreach (i; 0..rows)
+		{
+			ret ~= transversal(cells, i).array;
+		}
+		return ret;
+	}
+
+
 
 	public Box[][] boxes;
 	public Cell[][] cells;
+	public const SudokuType type;
+	public const int rows;
+	public const int columns;
+	public const int boxRows;
+	public const int boxColumns;
 }
 
 
 version(unittest) { import aurorafw.unit; }
 
-@("core:sudoku:grid: getters")
+version(unittest)
+{
+	import std.algorithm : each, equal, reverse;
+	int[][] digits4x4 =    [[1, 0, 0, 3],
+							[0, 2, 1, 4],
+							[4, 0, 0, 2],
+							[0, 3, 4, 1]];
+
+	int[][] transposed4x4 =    [[1, 0, 4, 0],
+								[0, 2, 0, 3],
+								[0, 1, 0, 4],
+								[3, 4, 2, 1]];
+
+	int[][] digits6x6 =    [[2, 0, 0, 0, 0, 0],
+							[3, 0, 0, 4, 5, 2],
+							[0, 5, 2, 3, 0, 6],
+							[4, 6, 3, 0, 1, 0],
+							[0, 2, 0, 0, 0, 4],
+							[0, 0, 4, 5, 2, 0]];
+
+	int[][] digits9x9 =    [[0, 0, 3, 2, 6, 0, 0, 0, 0],
+							[0, 0, 7, 0, 0, 1, 0, 2, 3],
+							[0, 8, 6, 0, 0, 0, 4, 0, 0],
+							[5, 0, 0, 0, 0, 8, 0, 9, 0],
+							[6, 4, 0, 3, 0, 7, 0, 1, 0],
+							[0, 0, 0, 0, 0, 0, 0, 0, 5],
+							[9, 2, 0, 0, 4, 0, 0, 0, 7],
+							[0, 0, 0, 0, 0, 5, 9, 8, 0],
+							[0, 0, 1, 6, 0, 0, 0, 3, 0]];
+}
+
+@("core:sudoku:grid: box")
 unittest
 {
-	Grid grid = new Grid(9,9,3,3);
+	Grid grid = new Grid(SudokuType.Sudoku9x9);
+	grid.initialize(digits9x9);
 
-	auto digits =  [[0, 0, 3, 2, 6, 0, 0, 0, 0],
-					[0, 0, 7, 0, 0, 1, 0, 2, 3],
-					[0, 8, 6, 0, 0, 0, 4, 0, 0],
-					[5, 0, 0, 0, 0, 8, 0, 9, 0],
-					[6, 4, 0, 3, 0, 7, 0, 1, 0],
-					[0, 0, 0, 0, 0, 0, 0, 0, 5],
-					[9, 2, 0, 0, 4, 0, 0, 0, 7],
-					[0, 0, 0, 0, 0, 5, 9, 8, 0],
-					[0, 0, 1, 6, 0, 0, 0, 3, 0]];
+	Box b = grid.box(4);
 
-	grid.initialize(digits);
+	assertTrue(b == grid.boxes[1][1]);
+	assertTrue(grid.toDigit(b.cells).equal([[0,0,8],
+											[3,0,7],
+											[0,0,0]]));
 
-	auto b = grid.box(4);
-	assertTrue(grid.toDigit(b.cells) ==    [[0, 0, 8],
-											[3, 0, 7],
-											[0, 0, 0]]);
+}
 
-	auto arr = grid.mainDiagonal();
-	assertTrue(grid.toDigit(arr) == [0,0,6,0,0,0,0,8,0]);
+@("core:sudoku:grid: cell")
+unittest
+{
+	Grid grid = new Grid(SudokuType.Sudoku4x4);
+	grid.initialize(digits4x4);
 
-	arr = grid.antiDiagonal();
-	assertTrue(grid.toDigit(arr) == [0,2,4,8,0,0,0,0,0]);
+	assertTrue(grid[0,0] == grid.cells[0][0]);
+	assertTrue(grid.cell(0,0) == grid.cells[0][0]);
+}
 
+@("core:sudoku:grid: columns")
+unittest
+{
+	Grid grid = new Grid(SudokuType.Sudoku6x6);
+	grid.initialize(digits6x6);
 
-	grid = new Grid(6,6,2,3);
+	assertTrue(grid.transposed().each!((i, ref row) => row.equal(grid.column(cast(int) i))));
+	assertTrue(grid.toDigit(grid.column(0)).equal([2,3,0,4,0,0]));
+}
 
-	digits =   [[2, 0, 0, 0, 0, 0],
-				[3, 0, 0, 4, 5, 2],
-				[0, 5, 2, 3, 0, 6],
-				[4, 6, 3, 0, 1, 0],
-				[0, 2, 0, 0, 0, 4],
-				[0, 0, 4, 5, 2, 0]];
+@("core:sudoku:grid: diagonals")
+unittest
+{
+	Grid grid = new Grid(SudokuType.Sudoku4x4);
+	grid.initialize(digits4x4);
 
-	grid.initialize(digits);
+	Cell[] main = [grid[0,0],grid[1,1],grid[2,2],grid[3,3]];
+	Cell[] anti = [grid[0,3],grid[1,2],grid[2,1],grid[3,0]];
+	assertTrue(grid.mainDiagonal().equal(main));
+	assertTrue(grid.antiDiagonal().equal(anti));
+	assertTrue(grid.toDigit(grid.mainDiagonal()).equal([1,2,0,1]));
+	assertTrue(grid.toDigit(grid.antiDiagonal()).equal([3,1,0,0]));
+}
 
-	b = grid.box(1);
-	assertTrue(grid.toDigit(b.cells) ==    [[0, 0, 0],
-											[4, 5, 2]]);
+@("core:sudoku:grid: dimensions")
+unittest
+{
+	Grid grid = new Grid(SudokuType.Sudoku4x4);
+
+	auto dim = grid.dimensions();
+	auto dim_ = Grid.dimensions(SudokuType.Sudoku4x4);
+	assertTrue(dim == dim_);
+}
+
+@("core:sudoku:grid: initialize")
+unittest
+{
+	Grid grid = new Grid(SudokuType.Sudoku4x4);
+	assertTrue(grid.cells[0][0] is null);
+
+	grid.initialize(digits4x4);
+
+	assertFalse(grid.cells[0][0] is null);
+	assertTrue(grid.cells[0][0].digit == 1);
+}
+
+@("core:sudoku:grid: rows")
+unittest
+{
+	Grid grid = new Grid(SudokuType.Sudoku6x6);
+	grid.initialize(digits6x6);
+
+	assertTrue(grid.cells.each!((i, ref row) => row.equal(grid.row(cast(int) i))));
+	assertTrue(grid.toDigit(grid.row(0)).equal([2,0,0,0,0,0]));
+}
+
+@("core:sudoku:grid: toArray")
+unittest
+{
+	Grid grid = new Grid(SudokuType.Sudoku4x4);
+	grid.initialize(digits4x4);
+
+	Cell[] cells = join(grid.cells[0 .. $]);
+	assertTrue(grid.toArray().equal(cells));
+	assertTrue(Grid.toDigit(grid.toArray()).equal([1,0,0,3,0,2,1,4,4,0,0,2,0,3,4,1]));
+}
+
+@("core:sudoku:grid: toDigit")
+unittest
+{
+	Grid grid = new Grid(SudokuType.Sudoku9x9);
+	grid.initialize(digits9x9);
+
+	assertTrue(grid.toDigit().equal(digits9x9));
+	assertTrue(Grid.toDigit(grid.cells).equal(digits9x9));
+}
+
+@("core:sudoku:grid: transposed")
+unittest
+{
+	Grid grid = new Grid(SudokuType.Sudoku4x4);
+	grid.initialize(digits4x4);
+
+	assertTrue(Grid.toDigit(grid.transposed()).equal(transposed4x4));
 }

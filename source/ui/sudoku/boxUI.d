@@ -4,7 +4,7 @@ import std.typecons : tuple;
 
 import gtk.Grid;
 
-import core.sudoku.sudoku : SudokuType;
+import core.sudoku.grid : SudokuType;
 
 public class BoxUI : Grid
 {
@@ -22,9 +22,9 @@ public class BoxUI : Grid
 	{
 		final switch (type)
 		{
-			case SudokuType.Sudoku_4X4: return tuple(300,300);
-			case SudokuType.Sudoku_6X6: return tuple(300,200);
-			case SudokuType.Sudoku_9X9: return tuple(195,195);
+			case SudokuType.Sudoku4x4: return tuple(300,300);
+			case SudokuType.Sudoku6x6: return tuple(300,200);
+			case SudokuType.Sudoku9x9: return tuple(195,195);
 		}
 	}
 }

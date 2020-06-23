@@ -10,7 +10,7 @@ import gtk.ToggleButton;
 
 import controllers.sudokuController;
 import controllers.sudokuWorld;
-import core.sudoku.sudoku : SudokuType;
+import core.sudoku.grid : SudokuType;
 import extra;
 import ui.menus.createMenu;
 import ui.sudoku.gridUI;
@@ -22,7 +22,7 @@ public class CreateMenuController
 		trace("Initializing CreateMenuController");
 		this.createMenu = createMenu;
 		this.sudokuWorld = sudokuWorld;
-		auto sc = sudokuWorld.addSudokuController(GameState.Create, SudokuType.Sudoku_4X4);
+		auto sc = sudokuWorld.addSudokuController(GameState.Create, SudokuType.Sudoku4x4);
 		createMenu.addGrid(GameState.Create, sc.gridUI);
 		createMenu.showGrid(sc.gridUI);
 		callbacks();

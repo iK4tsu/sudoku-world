@@ -13,10 +13,10 @@ import core.sudoku.cell;
  */
 public class UniqueConstraint : Constraint
 {
-	private this(Cell[] cells ...)
+	private this(Cell[] cells...)
 	{
 		super (ConstraintType.Unique);
-		this._cells ~= cells;
+		this.cells ~= cells;
 	}
 
 
@@ -52,6 +52,7 @@ public class UniqueConstraint : Constraint
 	}
 
 
+	@safe pure
 	public static ConstraintType getStaticConstraintType()
 	{
 		return ConstraintType.Unique;

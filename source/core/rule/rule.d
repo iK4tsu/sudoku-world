@@ -17,7 +17,7 @@ version(unittest)
 	import aurorafw.unit;
 	import core.constraint;
 	import core.sudoku.cell;
-	import core.sudoku.sudoku;
+	import core.sudoku.grid;
 	import std.algorithm : canFind;
 }
 
@@ -33,9 +33,8 @@ public void addRule(Grid grid, RuleType rule)
 @("core:rule:rule: addRule")
 unittest
 {
-	const auto dim = Sudoku.dimension(SudokuType.Sudoku_4X4);
-	Grid grid = new Grid(dim.expand);
-	grid.initialize(new int[][](dim.rows, dim.columns));
+	Grid grid = new Grid(SudokuType.Sudoku4x4);
+	grid.initialize();
 	grid.addRule(RuleType.Classic);
 
 	assertTrue(grid.toArray().each!(cell => cell.get!UniqueConstraint.cells.length == 8));
@@ -52,17 +51,16 @@ unittest
 public void addRuleClassic(Grid grid)
 {
 		// rows, columns, boxes
-		iota(grid.height).each!(i => UniqueConstraint.createInterconnected(grid.row(i)));
-		iota(grid.width).each!(i => UniqueConstraint.createInterconnected(grid.column(i)));
-		iota(grid.height).each!(i => UniqueConstraint.createInterconnected(grid.box(i).toArray()));
+		iota(grid.rows).each!(i => UniqueConstraint.createInterconnected(grid.row(i)));
+		iota(grid.columns).each!(i => UniqueConstraint.createInterconnected(grid.column(i)));
+		iota(grid.rows).each!(i => UniqueConstraint.createInterconnected(grid.box(i).toArray()));
 }
 
 @("core:rule:rule: addRuleClassic")
 unittest
 {
-	const auto dim = Sudoku.dimension(SudokuType.Sudoku_4X4);
-	Grid grid = new Grid(dim.expand);
-	grid.initialize(new int[][](dim.rows,dim.columns));
+	Grid grid = new Grid(SudokuType.Sudoku4x4);
+	grid.initialize();
 	addRuleClassic(grid);
 
 	auto cells = grid[0,0].get!UniqueConstraint.cells;
@@ -91,9 +89,8 @@ public void addRuleX(Grid grid)
 @("core:rule:rule: addRuleX")
 unittest
 {
-	const auto dim = Sudoku.dimension(SudokuType.Sudoku_4X4);
-	Grid grid = new Grid(dim.expand);
-	grid.initialize(new int[][](dim.rows,dim.columns));
+	Grid grid = new Grid(SudokuType.Sudoku4x4);
+	grid.initialize();
 	addRuleX(grid);
 
 	auto cells = grid[0,0].get!UniqueConstraint.cells;

@@ -10,7 +10,7 @@ import gtk.Grid;
 import gtk.Label;
 import gtk.StyleContext;
 
-import core.sudoku.sudoku;
+import core.sudoku.grid : SudokuGrid = Grid, SudokuType;
 import core.rule.rule : RuleType;
 import ui.sudoku.boxUI;
 import ui.sudoku.cellUI;
@@ -35,7 +35,7 @@ public class GridUI : Grid
 		context.addClass("sudoku");
 
 		this._type = type;
-		auto dimensions = Sudoku.dimension(type);
+		const auto dimensions = SudokuGrid.dimensions(type);
 		setDimensions(dimensions.expand);
 		buildBoxes(dimensions.boxRows, dimensions.boxColumns);
 
@@ -80,7 +80,7 @@ public class GridUI : Grid
 		{
 			for (int x; x < columns; x++)
 			{
-				auto cell = new CellUI(type, y, x, digits[y][x]);
+				auto cell = new CellUI(type, y, x, digits[y][x], rows);
 				cells[y][x] = cell;
 				boxes[y / boxRows][x / boxCols].attach(cell, x % boxCols, y % boxRows, 1, 1);
 			}
@@ -92,10 +92,10 @@ public class GridUI : Grid
 	{
 		final switch(type)
 		{
-			case SudokuType.Sudoku_4X4:
-			case SudokuType.Sudoku_6X6:
+			case SudokuType.Sudoku4x4:
+			case SudokuType.Sudoku6x6:
 				return tuple(600,600);
-			case SudokuType.Sudoku_9X9:
+			case SudokuType.Sudoku9x9:
 				return tuple(585,585);
 		}
 	}

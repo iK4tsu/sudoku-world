@@ -112,8 +112,8 @@ public void setCreateMenuCellInfoText(in int column, in int row, in int digit)
 
 	public auto addSudokuController(GameState state, SudokuType type)
 	{
-		Grid grid = new Grid(Sudoku.dimension(type).expand);
-		grid.initialize(new int[][](grid.height, grid.width));
+		Grid grid = new Grid(type);
+		grid.initialize(new int[][](grid.rows, grid.columns));
 		GridUI gridUI = new GridUI(type);
 		SudokuController sd = new SudokuController(grid, gridUI, state, this);
 		return sudokuControllers[state] = sd;
@@ -123,7 +123,7 @@ public void setCreateMenuCellInfoText(in int column, in int row, in int digit)
 	public auto addSudokuController(GameState state, SudokuController sudokuController)
 	{
 		SudokuType type = sudokuController.gridUI.type;
-		Grid grid = new Grid(Sudoku.dimension(type).expand);
+		Grid grid = new Grid(type);
 		int[][] digits = sudokuController.grid.toDigit();
 		grid.initialize(digits);
 		GridUI gridUI = new GridUI(type);

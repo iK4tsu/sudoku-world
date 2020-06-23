@@ -32,7 +32,7 @@ public class SudokuController
 		this.sudokuWorld = sudokuWorld;
 		_gameState = gameState;
 
-		gridUI.buildCells(grid.toDigit(), grid.height, grid.width);
+		gridUI.buildCells(grid.toDigit(), grid.rows, grid.columns);
 		callbacks();
 	}
 

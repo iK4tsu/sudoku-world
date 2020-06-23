@@ -9,44 +9,24 @@ import core.sudoku.cell;
 import core.sudoku.grid;
 
 
-public enum SudokuType
-{
-	Sudoku_4X4,
-	Sudoku_6X6,
-	Sudoku_9X9,
-}
-
 public class Sudoku
 {
-	public this(SudokuType type)
+	public this(Grid grid)
 	{
-		auto dim = dimension(type);
-		this.type = type;
-		this.rows = dim.rows;
-		this.columns = dim.columns;
-		this.boxRows = dim.boxRows;
-		this.boxColumns = dim.boxColumns;
-
-		grid = new Grid(rows, columns, boxRows, boxColumns);
-	}
-
-
-	public void initialize(int[][] digits)
-	{
-		grid.initialize(digits);
+		this.grid = grid;
 	}
 
 
 	public auto solve()
 	{
 		backtrackAlgorithm(0,0);
-		return solution = grid.toDigit();
+		return grid.toDigit();
 	}
 
 
-	public int backtrackAlgorithm(in int row, in int column)
+	private int backtrackAlgorithm(in int row, in int column)
 	{
-		auto coords = grid.nextCell(row, column);
+		auto coords = nextCell(row, column);
 
 		// if a cell is blocked (has a given number) we move foward
 		if (grid.cells[row][column].isBlocked)
@@ -57,7 +37,7 @@ public class Sudoku
 
 		// let's try every number from 1 to our max digit
 		// max digit is the row/column length
-		for (int i = 1; i <= rows; i++)
+		for (int i = 1; i <= grid.rows; i++)
 		{
 			if (grid.cells[row][column].isValid(i))
 			{
@@ -76,27 +56,33 @@ public class Sudoku
 	}
 
 
-	/** Standard Sudoku dimensions
+	/** Position of the next cell
+	 *
+	 * This is used internaly by the backtrackAlgorithm
 	 *
 	 * Params:
-	 *     type = SudokuType to process
+	 *     row = current row int the Grid
+	 *     column = current column int the Grid
 	 *
-	 * Returns: `tuple`***("rows","columns","boxRows","boxColumns")*** with the
-	 *     dimensions of SudokuType
+	 * Returns:
+	 *     `tuple`***("row","column")*** with the position of the next Cell \
+	 *     `tuple`***("row","column")(-1,-1)*** if params correspond to the last Cell
 	 */
-	public static auto dimension(SudokuType type)
+	private auto nextCell(int row, int column)
 	{
-		final switch (type)
-		{
-			case SudokuType.Sudoku_4X4:
-				return tuple!("rows","columns","boxRows","boxColumns")(4,4,2,2);
+		import std.typecons : tuple;
 
-			case SudokuType.Sudoku_6X6:
-				return tuple!("rows","columns","boxRows","boxColumns")(6,6,2,3);
+		// last cell of grid
+		if (row == grid.rows - 1 && column == grid.columns - 1)
+			return tuple!("row","column")(-1, -1);
 
-			case SudokuType.Sudoku_9X9:
-				return tuple!("rows","columns","boxRows","boxColumns")(9,9,3,3);
-		}
+		// last cell of column
+		else if (column == grid.columns - 1)
+			return tuple!("row","column")(row + 1, 0);
+
+		// cell in the middle
+		else
+			return tuple!("row","column")(row, column + 1);
 	}
 
 
@@ -145,14 +131,7 @@ public class Sudoku
 	}
 
 
-	public int rows;
-	public int columns;
-	public int boxRows;
-	public int boxColumns;
-
-	public SudokuType type;
-	public Grid grid;
-	public int[][] solution;
+	private Grid grid;
 }
 
 
@@ -210,10 +189,11 @@ version(unittest)
 @("core:sudoku:sudoku: classic solve 4x4")
 unittest
 {
-	Sudoku sudoku = new Sudoku(SudokuType.Sudoku_4X4);
+	Grid grid = new Grid(SudokuType.Sudoku4x4);
+	grid.initialize(classic4x4);
+	addRuleClassic(grid);
 
-	sudoku.initialize(classic4x4);
-	addRuleClassic(sudoku.grid);
+	Sudoku sudoku = new Sudoku(grid);
 
 	assertTrue(sudoku.solve() == classicSolve4x4);
 }
@@ -221,10 +201,11 @@ unittest
 @("core:sudoku:sudoku: classic solve 6x6")
 unittest
 {
-	Sudoku sudoku = new Sudoku(SudokuType.Sudoku_6X6);
+	Grid grid = new Grid(SudokuType.Sudoku6x6);
+	grid.initialize(classic6x6);
+	addRuleClassic(grid);
 
-	sudoku.initialize(classic6x6);
-	addRuleClassic(sudoku.grid);
+	Sudoku sudoku = new Sudoku(grid);
 
 	assertTrue(sudoku.solve() == classicSolve6x6);
 }
@@ -232,10 +213,11 @@ unittest
 @("core:sudoku:sudoku: classic solve 9x9")
 unittest
 {
-	Sudoku sudoku = new Sudoku(SudokuType.Sudoku_9X9);
+	Grid grid = new Grid(SudokuType.Sudoku9x9);
+	grid.initialize(classic9x9);
+	addRuleClassic(grid);
 
-	sudoku.initialize(classic9x9);
-	addRuleClassic(sudoku.grid);
+	Sudoku sudoku = new Sudoku(grid);
 
 	assertTrue(sudoku.solve() == classicSolve9x9);
 }
@@ -273,10 +255,12 @@ version(unittest)
 @("core:sudoku:sudoku: x solve 4x4")
 unittest
 {
-	Sudoku sudoku = new Sudoku(SudokuType.Sudoku_4X4);
+	Grid grid = new Grid(SudokuType.Sudoku4x4);
+	grid.initialize(x4x4);
+	addRuleClassic(grid);
 
-	sudoku.initialize(x4x4);
-	addRuleClassic(sudoku.grid);
+	Sudoku sudoku = new Sudoku(grid);
+
 	addRuleX(sudoku.grid);
 
 	assertTrue(sudoku.solve() == xSolve4x4);
@@ -285,11 +269,12 @@ unittest
 @("core:sudoku:sudoku: x solve 6x6")
 unittest
 {
-	Sudoku sudoku = new Sudoku(SudokuType.Sudoku_6X6);
+	Grid grid = new Grid(SudokuType.Sudoku6x6);
+	grid.initialize(x6x6);
+	addRuleClassic(grid);
+	addRuleX(grid);
 
-	sudoku.initialize(x6x6);
-	addRuleClassic(sudoku.grid);
-	addRuleX(sudoku.grid);
+	Sudoku sudoku = new Sudoku(grid);
 
 	assertTrue(sudoku.solve() == xSolve6x6);
 }

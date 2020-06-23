@@ -25,7 +25,7 @@ import gtk.Window;
 
 import controllers.sudokuController : GameState;
 import core.rule.rule : RuleType;
-import core.sudoku.sudoku : SudokuType;
+import core.sudoku.grid : SudokuType;
 import extra : toEnumString;
 import ui.sudoku.gridUI;
 

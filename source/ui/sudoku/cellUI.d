@@ -23,7 +23,7 @@ import gtk.Stack;
 import gtk.Widget;
 
 import core.sudoku.cell;
-import core.sudoku.sudoku;
+import core.sudoku.grid : SudokuType;
 import ui.sudoku.gridUI;
 import ui.sudoku.sudokuHelper;
 
@@ -40,7 +40,7 @@ public enum Color : Tuple!(double, double, double)
 
 public class CellUI : DrawingArea
 {
-	public this(SudokuType type, int row, int column, int digit)
+	public this(SudokuType type, int row, int column, int digit, int maxDigit)
 	{
 		setHalign(GtkAlign.CENTER);
 		setValign(GtkAlign.CENTER);
@@ -61,7 +61,7 @@ public class CellUI : DrawingArea
 
 		this._row = row;
 		this._column = column;
-		this._maxDigit = Sudoku.dimension(type).rows;
+		this._maxDigit = maxDigit;
 		this._digit = digit;
 		this._isBlocked = _digit != 0;
 	}
@@ -71,9 +71,9 @@ public class CellUI : DrawingArea
 	{
 		final switch(type)
 		{
-			case SudokuType.Sudoku_4X4: return tuple(150,150);
-			case SudokuType.Sudoku_6X6: return tuple(100,100);
-			case SudokuType.Sudoku_9X9: return tuple(65,65);
+			case SudokuType.Sudoku4x4: return tuple(150,150);
+			case SudokuType.Sudoku6x6: return tuple(100,100);
+			case SudokuType.Sudoku9x9: return tuple(65,65);
 		}
 	}
 

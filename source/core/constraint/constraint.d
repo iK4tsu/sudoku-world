@@ -21,6 +21,7 @@ public abstract class Constraint : IConstraint
 	public abstract void connect(Cell cell);
 	public abstract bool isValid(in int digit);
 
+	@safe pure
 	public ConstraintType constraintType() const @property
 	{
 		return _constraintType;
@@ -30,17 +31,13 @@ public abstract class Constraint : IConstraint
 	{
 		if (!canFind(cells, cell))
 		{
-			_cells ~= cell;
+			cells ~= cell;
 			return true;
 		}
 		return false;
 	}
 
-	public auto cells() @property
-	{
-		return _cells;
-	}
 
-	protected Cell[] _cells;
+	public Cell[] cells;
 	protected ConstraintType _constraintType;
 }

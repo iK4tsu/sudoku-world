@@ -4,10 +4,10 @@ import core.constraint.constraint;
 
 public class Cell
 {
-	public this(int digit)
+	public this(in int digit)
 	{
 		this.digit = digit;
-		isBlocked = !digit ? false : true;
+		isBlocked = digit != 0;
 	}
 
 
@@ -40,6 +40,7 @@ public class Cell
 	}
 
 
+	@safe
 	public C get(C : Constraint)()
 	{
 		foreach (Constraint c; constraints)
@@ -78,7 +79,8 @@ public class Cell
 		return true;
 	}
 
-	public bool isBlocked;
+
+	public const bool isBlocked;
 	public int digit;
 
 	public Constraint[] constraints;
