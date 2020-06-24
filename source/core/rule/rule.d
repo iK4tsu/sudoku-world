@@ -37,7 +37,7 @@ unittest
 	grid.initialize();
 	grid.addRule(RuleType.Classic);
 
-	assertTrue(grid.toArray().each!(cell => cell.get!UniqueConstraint.cells.length == 8));
+	assertTrue(grid.toArray().each!(cell => cell.get!UniqueConstraint.cells.length == 7));
 }
 
 
@@ -67,7 +67,7 @@ unittest
 	assertTrue(cells.each!(c => canFind(grid.row(0), c)));
 	assertTrue(cells.each!(c => canFind(grid.column(0), c)));
 	assertTrue(cells.each!(c => canFind(grid.box(0).toArray(), c)));
-	assertTrue(cells.length == 8);
+	assertTrue(cells.length == 7);
 
 	assertTrue(grid.toArray().each!(cell => cell.get!UniqueConstraint.cells.length == 8));
 }
@@ -95,11 +95,11 @@ unittest
 
 	auto cells = grid[0,0].get!UniqueConstraint.cells;
 	assertTrue(cells.each!(c => canFind(grid.mainDiagonal(), c)));
-	assertTrue(cells.length == 4);
+	assertTrue(cells.length == 3);
 
 	cells = grid[3,3].get!UniqueConstraint.cells;
 	assertTrue(cells.each!(c => canFind(grid.antiDiagonal(), c)));
-	assertTrue(cells.length == 4);
+	assertTrue(cells.length == 3);
 
 	assertTrue(grid[0,1].get!UniqueConstraint is null);
 }
