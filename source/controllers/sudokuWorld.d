@@ -20,7 +20,7 @@ public class SudokuWorld
 	{
 		trace("Initializing SudokuWorld");
 		_app = app;
-		_createMenuController = new CreateMenuController(new CreateMenu(app.builder), this);
+		createMenuController = new CreateMenuController(new CreateMenu(app.builder), this);
 		callbacks();
 	}
 
@@ -81,25 +81,17 @@ public class SudokuWorld
 		else if (GameState.Solution in sudokuControllers)
 		{
 			gridUI = sudokuControllers[GameState.Solution].gridUI;
-			_createMenuController.setCellInfoText(0,0,0);
+			createMenuController.setCellInfoText(0,0,0);
 		}
 		else if (GameState.Create in sudokuControllers)
 		{
 			gridUI = sudokuControllers[GameState.Create].gridUI;
-			_createMenuController.setCellInfoText(0,0,0);
+			createMenuController.setCellInfoText(0,0,0);
 		}
 		gridUI.cleanFocus();
 		return false;
 	}
 
-
-
-// functions
-
-public void setCreateMenuCellInfoText(in int column, in int row, in int digit)
-{
-	_createMenuController.setCellInfoText(column, row, digit);
-}
 
 
 // Getters/Setters
@@ -149,25 +141,13 @@ public void setCreateMenuCellInfoText(in int column, in int row, in int digit)
 	}
 
 
-	public auto getSudokuController(GameState state)
-	{
-		return sudokuControllers[state];
-	}
-
-
-	public auto createMenuController() const @property
-	{
-		return _createMenuController;
-	}
-
-
 	public auto app() const @property
 	{
 		return _app;
 	}
 
 
-	private CreateMenuController _createMenuController;
-	private SudokuController[GameState] sudokuControllers;
+	public CreateMenuController createMenuController;
+	public SudokuController[GameState] sudokuControllers;
 	private SudokuApp _app;
 }

@@ -109,7 +109,7 @@ public class CreateMenuController
 			createMenu.setCbSudokuTypeSensitive(true);
 
 			// show Create grid
-			createMenu.showGrid(sudokuWorld.getSudokuController(GameState.Create).gridUI);
+			createMenu.showGrid(sudokuController.gridUI);
 
 			// delete solution
 			sudokuWorld.deleteSudokuController(GameState.Solution);
@@ -147,7 +147,7 @@ public class CreateMenuController
 		{
 			// create a new solution
 			SudokuController sc;
-			sc = sudokuWorld.addSudokuController(GameState.Solution, sudokuWorld.getSudokuController(GameState.Create));
+			sc = sudokuWorld.addSudokuController(GameState.Solution, sudokuController);
 
 			// add the solution to the stack
 			createMenu.addGrid(GameState.Solution, sc.gridUI);
@@ -161,7 +161,7 @@ public class CreateMenuController
 		else
 		{
 			// show Create grid
-			createMenu.showGrid(sudokuWorld.getSudokuController(GameState.Create).gridUI);
+			createMenu.showGrid(sudokuController.gridUI);
 
 			// delete Solution grid
 			sudokuWorld.deleteSudokuController(GameState.Solution);
@@ -183,6 +183,12 @@ public class CreateMenuController
 
 
 // Functions
+
+	private SudokuController sudokuController() @property
+	{
+		return sudokuWorld.sudokuControllers[GameState.Create];
+	}
+
 
 	private void switchGridType(SudokuType type)
 	{

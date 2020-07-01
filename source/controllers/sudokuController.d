@@ -9,6 +9,7 @@ import gdk.Event;
 import gdk.Keymap;
 import gtk.Widget;
 
+import controllers.createMenuController;
 import controllers.sudokuWorld;
 import core.sudoku.grid;
 import ui.menus.createMenu;
@@ -84,18 +85,6 @@ public class SudokuController
 
 		trace("BUTTON_1 Pressed");
 		CellUI cell = cast(CellUI) widget;
-		if ((ev.state & ModifierType.CONTROL_MASK) == 0)
-		{
-			// clear all other focused cells
-			gridUI.cleanFocus();
-
-			// update left bar
-			if (gameState != GameState.Play)
-			{
-				sudokuWorld.setCreateMenuCellInfoText(cell.row, cell.column, cell.digit);
-			}
-		}
-
 		// focus this cell
 		// add this cell to the focused list
 		gridUI.setCellFocus(cell.row, cell.column);
@@ -106,6 +95,18 @@ public class SudokuController
 		//   is pressed
 		Device device = new Device(ev.device);
 		device.getSeat().ungrab();
+
+		if ((ev.state & ModifierType.CONTROL_MASK) == 0)
+		{
+			// clear all other focused cells
+			gridUI.cleanFocus();
+
+			// update left bar
+			if (gameState != GameState.Play)
+			{
+				createMenuController.setCellInfoText(cell.row, cell.column, cell.digit);
+			}
+		}
 
 		return true;
 	}
@@ -405,6 +406,12 @@ public class SudokuController
 
 
 // Getters/Setters
+
+	private CreateMenuController createMenuController() @property
+	{
+		return sudokuWorld.createMenuController;
+	}
+
 
 	public auto gameState() const @property
 	{
