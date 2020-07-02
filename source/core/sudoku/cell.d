@@ -1,6 +1,7 @@
 module core.sudoku.cell;
 
 import core.constraint;
+import core.rule;
 
 public class Cell
 {
@@ -207,6 +208,7 @@ public class Cell
 	public int digit;
 
 	public Constraint[ConstraintType] constraints;
+	public Rule[RuleType] rules;
 }
 
 

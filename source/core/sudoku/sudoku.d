@@ -139,7 +139,7 @@ version(unittest) { import aurorafw.unit; }
 
 version(unittest)
 {
-	import core.rule.rule : addRuleClassic;
+	import core.rule.classic;
 
 	int[][] classic4x4 =   [[1, 0, 0, 3],
 							[0, 2, 1, 4],
@@ -165,15 +165,15 @@ version(unittest)
 								[3, 1, 2, 6, 4, 5],
 								[6, 4, 5, 1, 3, 2]];
 
-	int[][] classic9x9 =  [[0, 0, 3, 2, 6, 0, 0, 0, 0],
-								[0, 0, 7, 0, 0, 1, 0, 2, 3],
-								[0, 8, 6, 0, 0, 0, 4, 0, 0],
-								[5, 0, 0, 0, 0, 8, 0, 9, 0],
-								[6, 4, 0, 3, 0, 7, 0, 1, 0],
-								[0, 0, 0, 0, 0, 0, 0, 0, 5],
-								[9, 2, 0, 0, 4, 0, 0, 0, 7],
-								[0, 0, 0, 0, 0, 5, 9, 8, 0],
-								[0, 0, 1, 6, 0, 0, 0, 3, 0]];
+	int[][] classic9x9 =   [[0, 0, 3, 2, 6, 0, 0, 0, 0],
+							[0, 0, 7, 0, 0, 1, 0, 2, 3],
+							[0, 8, 6, 0, 0, 0, 4, 0, 0],
+							[5, 0, 0, 0, 0, 8, 0, 9, 0],
+							[6, 4, 0, 3, 0, 7, 0, 1, 0],
+							[0, 0, 0, 0, 0, 0, 0, 0, 5],
+							[9, 2, 0, 0, 4, 0, 0, 0, 7],
+							[0, 0, 0, 0, 0, 5, 9, 8, 0],
+							[0, 0, 1, 6, 0, 0, 0, 3, 0]];
 
 	int[][] classicSolve9x9 =  [[1, 5, 3, 2, 6, 4, 8, 7, 9],
 								[4, 9, 7, 5, 8, 1, 6, 2, 3],
@@ -191,7 +191,7 @@ unittest
 {
 	Grid grid = new Grid(SudokuType.Sudoku4x4);
 	grid.initialize(classic4x4);
-	addRuleClassic(grid);
+	ClassicRule.create(grid);
 
 	Sudoku sudoku = new Sudoku(grid);
 
@@ -203,7 +203,7 @@ unittest
 {
 	Grid grid = new Grid(SudokuType.Sudoku6x6);
 	grid.initialize(classic6x6);
-	addRuleClassic(grid);
+	ClassicRule.create(grid);
 
 	Sudoku sudoku = new Sudoku(grid);
 
@@ -215,7 +215,7 @@ unittest
 {
 	Grid grid = new Grid(SudokuType.Sudoku9x9);
 	grid.initialize(classic9x9);
-	addRuleClassic(grid);
+	ClassicRule.create(grid);
 
 	Sudoku sudoku = new Sudoku(grid);
 
@@ -225,7 +225,7 @@ unittest
 
 version(unittest)
 {
-	import core.rule.rule : addRuleX;
+	import core.rule.x;
 
 	int[][] x4x4 = [[1,2,0,0],
 					[0,0,0,0],
@@ -257,11 +257,10 @@ unittest
 {
 	Grid grid = new Grid(SudokuType.Sudoku4x4);
 	grid.initialize(x4x4);
-	addRuleClassic(grid);
+	ClassicRule.create(grid);
+	XRule.create(grid);
 
 	Sudoku sudoku = new Sudoku(grid);
-
-	addRuleX(sudoku.grid);
 
 	assertTrue(sudoku.solve() == xSolve4x4);
 }
@@ -271,8 +270,8 @@ unittest
 {
 	Grid grid = new Grid(SudokuType.Sudoku6x6);
 	grid.initialize(x6x6);
-	addRuleClassic(grid);
-	addRuleX(grid);
+	ClassicRule.create(grid);
+	XRule.create(grid);
 
 	Sudoku sudoku = new Sudoku(grid);
 
