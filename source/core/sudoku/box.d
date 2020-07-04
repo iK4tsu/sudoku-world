@@ -52,3 +52,52 @@ public class Box
 	public const int columns;
 	public const int rows;
 }
+
+
+version(unittest) { import aurorafw.unit; }
+
+version(unittest)
+{
+	Cell[][] cells = [[new Cell(0),new Cell(1)],[new Cell(2),new Cell(3)]];
+}
+
+
+@("core:sudoku:box: initialize")
+unittest
+{
+	import std.algorithm : each;
+	import std.range : join;
+
+	Box box = new Box(2,2);
+
+	box.cells.join.each!(cell => assertNull(cell));
+
+	box.initialize(cells);
+
+	box.cells.join.each!(cell => assertNotNull(cell));
+	assertSame(box.cells, cells);
+}
+
+@("core:sudoku:box: toArray")
+unittest
+{
+	import std.algorithm : equal;
+	import std.range : join;
+
+	Box box = new Box(2,2);
+	box.initialize(cells);
+
+	assertTrue(box.toArray().equal(cells.join));
+}
+
+@("core:sudoku:box: toDigit")
+unittest
+{
+	import std.algorithm : each;
+	import std.range : join;
+
+	Box box = new Box(2,2);
+	box.initialize(cells);
+
+	box.toDigit.join.each!((i, ref digit) => assertEquals(digit, cells.join[i].digit));
+}

@@ -136,7 +136,6 @@ public class Sudoku
 
 
 version(unittest) { import aurorafw.unit; }
-
 version(unittest)
 {
 	import core.rule.classic;
@@ -189,37 +188,43 @@ version(unittest)
 @("core:sudoku:sudoku: classic solve 4x4")
 unittest
 {
+	import std.algorithm : equal;
+
 	Grid grid = new Grid(SudokuType.Sudoku4x4);
 	grid.initialize(classic4x4);
 	ClassicRule.create(grid);
 
 	Sudoku sudoku = new Sudoku(grid);
 
-	assertTrue(sudoku.solve() == classicSolve4x4);
+	assertTrue(sudoku.solve().equal(classicSolve4x4));
 }
 
 @("core:sudoku:sudoku: classic solve 6x6")
 unittest
 {
+	import std.algorithm : equal;
+
 	Grid grid = new Grid(SudokuType.Sudoku6x6);
 	grid.initialize(classic6x6);
 	ClassicRule.create(grid);
 
 	Sudoku sudoku = new Sudoku(grid);
 
-	assertTrue(sudoku.solve() == classicSolve6x6);
+	assertTrue(sudoku.solve().equal(classicSolve6x6));
 }
 
 @("core:sudoku:sudoku: classic solve 9x9")
 unittest
 {
+	import std.algorithm : equal;
+
 	Grid grid = new Grid(SudokuType.Sudoku9x9);
 	grid.initialize(classic9x9);
 	ClassicRule.create(grid);
 
 	Sudoku sudoku = new Sudoku(grid);
 
-	assertTrue(sudoku.solve() == classicSolve9x9);
+	assertTrue(sudoku.solve().equal(classicSolve9x9));
 }
 
 
@@ -255,6 +260,8 @@ version(unittest)
 @("core:sudoku:sudoku: x solve 4x4")
 unittest
 {
+	import std.algorithm : equal;
+
 	Grid grid = new Grid(SudokuType.Sudoku4x4);
 	grid.initialize(x4x4);
 	ClassicRule.create(grid);
@@ -262,12 +269,14 @@ unittest
 
 	Sudoku sudoku = new Sudoku(grid);
 
-	assertTrue(sudoku.solve() == xSolve4x4);
+	assertTrue(sudoku.solve().equal(xSolve4x4));
 }
 
 @("core:sudoku:sudoku: x solve 6x6")
 unittest
 {
+	import std.algorithm : equal;
+
 	Grid grid = new Grid(SudokuType.Sudoku6x6);
 	grid.initialize(x6x6);
 	ClassicRule.create(grid);
@@ -275,5 +284,5 @@ unittest
 
 	Sudoku sudoku = new Sudoku(grid);
 
-	assertTrue(sudoku.solve() == xSolve6x6);
+	assertTrue(sudoku.solve().equal(xSolve6x6));
 }

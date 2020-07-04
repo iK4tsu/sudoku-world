@@ -332,7 +332,6 @@ public class Grid
 
 
 version(unittest) { import aurorafw.unit; }
-
 version(unittest)
 {
 	import std.algorithm : each, equal, reverse;
@@ -367,12 +366,14 @@ version(unittest)
 @("core:sudoku:grid: box")
 unittest
 {
+	import std.algorithm : equal;
+
 	Grid grid = new Grid(SudokuType.Sudoku9x9);
 	grid.initialize(digits9x9);
 
 	Box b = grid.box(4);
 
-	assertTrue(b == grid.boxes[1][1]);
+	assertSame(b, grid.boxes[1][1]);
 	assertTrue(grid.toDigit(b.cells).equal([[0,0,8],
 											[3,0,7],
 											[0,0,0]]));
@@ -385,28 +386,34 @@ unittest
 	Grid grid = new Grid(SudokuType.Sudoku4x4);
 	grid.initialize(digits4x4);
 
-	assertTrue(grid[0,0] == grid.cells[0][0]);
-	assertTrue(grid.cell(0,0) == grid.cells[0][0]);
+	assertSame(grid[0,0], grid.cells[0][0]);
+	assertSame(grid.cell(0,0), grid.cells[0][0]);
 }
 
 @("core:sudoku:grid: columns")
 unittest
 {
+	import std.algorithm : each, equal;
+	import std.range : transposed;
+
 	Grid grid = new Grid(SudokuType.Sudoku6x6);
 	grid.initialize(digits6x6);
 
-	assertTrue(grid.transposed().each!((i, ref row) => row.equal(grid.column(cast(int) i))));
+	grid.transposed().each!((i, ref row) => assertTrue(row.equal(grid.column(cast(int) i))));
 	assertTrue(grid.toDigit(grid.column(0)).equal([2,3,0,4,0,0]));
 }
 
 @("core:sudoku:grid: diagonals")
 unittest
 {
+	import std.algorithm : equal;
+
 	Grid grid = new Grid(SudokuType.Sudoku4x4);
 	grid.initialize(digits4x4);
 
 	Cell[] main = [grid[0,0],grid[1,1],grid[2,2],grid[3,3]];
 	Cell[] anti = [grid[0,3],grid[1,2],grid[2,1],grid[3,0]];
+
 	assertTrue(grid.mainDiagonal().equal(main));
 	assertTrue(grid.antiDiagonal().equal(anti));
 	assertTrue(grid.toDigit(grid.mainDiagonal()).equal([1,2,0,1]));
@@ -420,38 +427,45 @@ unittest
 
 	auto dim = grid.dimensions();
 	auto dim_ = Grid.dimensions(SudokuType.Sudoku4x4);
-	assertTrue(dim == dim_);
+
+	assertEquals(dim, dim_);
 }
 
 @("core:sudoku:grid: initialize")
 unittest
 {
 	Grid grid = new Grid(SudokuType.Sudoku4x4);
-	assertTrue(grid.cells[0][0] is null);
+
+	assertNull(grid.cells[0][0]);
 
 	grid.initialize(digits4x4);
 
-	assertFalse(grid.cells[0][0] is null);
-	assertTrue(grid.cells[0][0].digit == 1);
+	assertNotNull(grid.cells[0][0]);
+	assertEquals(grid.cells[0][0].digit, 1);
 }
 
 @("core:sudoku:grid: rows")
 unittest
 {
+	import std.algorithm : each, equal;
+
 	Grid grid = new Grid(SudokuType.Sudoku6x6);
 	grid.initialize(digits6x6);
 
-	assertTrue(grid.cells.each!((i, ref row) => row.equal(grid.row(cast(int) i))));
+	grid.cells.each!((i, ref row) => assertTrue(row.equal(grid.row(cast(int) i))));
 	assertTrue(grid.toDigit(grid.row(0)).equal([2,0,0,0,0,0]));
 }
 
 @("core:sudoku:grid: toArray")
 unittest
 {
+	import std.algorithm : equal;
+
 	Grid grid = new Grid(SudokuType.Sudoku4x4);
 	grid.initialize(digits4x4);
 
 	Cell[] cells = join(grid.cells[0 .. $]);
+
 	assertTrue(grid.toArray().equal(cells));
 	assertTrue(Grid.toDigit(grid.toArray()).equal([1,0,0,3,0,2,1,4,4,0,0,2,0,3,4,1]));
 }
@@ -459,6 +473,8 @@ unittest
 @("core:sudoku:grid: toDigit")
 unittest
 {
+	import std.algorithm : equal;
+
 	Grid grid = new Grid(SudokuType.Sudoku9x9);
 	grid.initialize(digits9x9);
 
@@ -469,6 +485,8 @@ unittest
 @("core:sudoku:grid: transposed")
 unittest
 {
+	import std.algorithm : equal;
+
 	Grid grid = new Grid(SudokuType.Sudoku4x4);
 	grid.initialize(digits4x4);
 
