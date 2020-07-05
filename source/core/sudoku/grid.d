@@ -1,9 +1,6 @@
 module core.sudoku.grid;
 
-import std.algorithm : map;
-import std.array : array, join;
-import std.range : iota, front, transversal;
-import std.typecons : tuple, Tuple;
+import std.typecons : Tuple;
 
 import core.sudoku.box;
 import core.sudoku.cell;
@@ -50,8 +47,14 @@ public class Grid
 	 * Returns: `tuple`***("rows","columns","boxRows","boxColumns")*** with the
 	 *     dimensions of SudokuType
 	 */
-	public static auto dimensions(in SudokuType type)
+	public static Tuple!(int,"rows",
+							int,"columns",
+							int,"boxRows",
+							int,"boxColumns")
+	dimensions(in SudokuType type)
 	{
+		import std.typecons : tuple;
+
 		final switch (type)
 		{
 			case SudokuType.Sudoku4x4:
@@ -70,8 +73,13 @@ public class Grid
 	 *
 	 * Returns: `tuple`***("rows","columns","boxRows","boxColumns")***
 	 */
-	public auto dimensions() const
+	public Tuple!(const int,"rows",
+					const int,"columns",
+					const int,"boxRows",
+					const int,"boxColumns")
+	dimensions() const
 	{
+		import std.typecons : tuple;
 		return tuple!("rows","columns","boxRows","boxColumns")(rows,columns,boxRows,boxColumns);
 	}
 
@@ -98,6 +106,9 @@ public class Grid
 	 */
 	public void initialize(in int[][] digits)
 	{
+		import std.algorithm : map;
+		import std.array : array;
+
 		for (int row; row < columns; row++)
 		{
 			for (int col; col < rows; col++)
@@ -145,6 +156,9 @@ public class Grid
 	 */
 	public static int[][] toDigit(Cell[][] cells)
 	{
+		import std.algorithm : map;
+		import std.array : array;
+
 		return cells.map!(row => row.map!(cell => cell.digit).array).array;
 	}
 
@@ -159,6 +173,9 @@ public class Grid
 	 */
 	public static int[] toDigit(Cell[] cells)
 	{
+		import std.algorithm : map;
+		import std.array : array;
+
 		return cells.map!(cell => cell.digit).array;
 	}
 
@@ -197,6 +214,9 @@ public class Grid
 	}
 	body
 	{
+		import std.array : array;
+		import std.range : transversal;
+
 		return transversal(cells, index).array;
 	}
 
@@ -216,6 +236,8 @@ public class Grid
 	}
 	body
 	{
+		import std.range : join;
+
 		return boxes.join[index];
 	}
 
@@ -300,6 +322,8 @@ public class Grid
 
 	public static Cell[] toArray(Cell[][] cells)
 	{
+		import std.range : join;
+
 		return cells.join;
 	}
 
@@ -311,6 +335,9 @@ public class Grid
 	 */
 	public Cell[][] transposed()
 	{
+		import std.array : array;
+		import std.range : transversal;
+
 		Cell[][] ret;
 		foreach (i; 0..rows)
 		{
@@ -460,6 +487,7 @@ unittest
 unittest
 {
 	import std.algorithm : equal;
+	import std.range : join;
 
 	Grid grid = new Grid(SudokuType.Sudoku4x4);
 	grid.initialize(digits4x4);
