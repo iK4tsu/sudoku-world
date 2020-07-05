@@ -1,8 +1,6 @@
 module core.sudoku.sudoku;
 
-import std.experimental.logger;
 import std.json;
-import std.typecons : tuple;
 
 import core.rule.rule;
 import core.sudoku.cell;

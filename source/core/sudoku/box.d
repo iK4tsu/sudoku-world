@@ -1,7 +1,5 @@
 module core.sudoku.box;
 
-import std.array: join;
-
 import core.sudoku.cell;
 import core.sudoku.grid;
 
